@@ -1,0 +1,836 @@
+.\" Man page generated from reStructuredText.
+.
+.TH CTXOPT  "" "" ""
+.SH NAME
+ctxopt \- Advanced command line options manager.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH DESCRIPTION
+.sp
+\fBctxopt\fP provides an advanced way to parse and evaluate complex command
+line parameters and arguments.
+.sp
+Only two files \fBctxopt.h\fP and \fBctxopt.c\fP are needed to use \fBctxopt\fP
+in your projects.
+.SS CONCEPTS
+.sp
+The command line can be considered as a tree of contexts.
+This offers the possibility of having a hierarchy of option groups.
+.sp
+Each option has a set of parameters which must start with a single dash
+and may appear in the command line.
+These parameters are not limited to a dash followed by single letter.
+In what follows, I will consider for simplicity that these are the options
+which are visible in the command line and not one of their parameters.
+.sp
+Unless explicitly stated, the options are processed in the same order
+as they appear in the command line, from left to right.
+.sp
+Any option may have the ability to modify the current context.
+If such an option is seen in the command line, then the next option will
+be looked for in this new context.
+.sp
+Initially the default context is the first created one in the program.
+.sp
+Exiting a context can be explicit, see below, or implicit if the current
+option is not supported in this context.
+The previous context in the hierarchy then becomes the current context
+if it is not already the highest one.
+.sp
+An option which is unknown in the current context will be automatically
+reevaluated in the previous one in the hierarchy.
+If there is no such context, then a fatal error occurs.
+.sp
+A context can be explicitly delimited by a pair of symbols \fB{\fP and
+\fB}\fP\&.
+The symbol \fB{\fP car appear just before or after the option responsible
+of the context change.
+.sp
+The symbol \fB}\fP forces the end of a context.
+.sp
+The presence of \fB{\fP and \fB}\fP is purely optional and rarely necessary
+but can help readability.
+.SS FUNCTIONS
+.sp
+The API consists in the following functions:
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_init(char *\fP \fIprog_name\fP\fB);\fP
+.sp
+This function initializes the internal structures uses by \fBctxopt\fP\&.
+It is mandatory and must me called first.
+.sp
+Its only argument \fIprog_name\fP is typically the content of \fBargv[0]\fP
+which nearly always contains the name of the program.
+.sp
+\fIprog_name\fP is used by the error system.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_new_ctx(char *\fP \fIname\fP\fB, char *\fP \fIopts_specs\fP\fB);\fP
+.sp
+The next thing to do after having called \fBctxopt_new_ctx\fP is to
+define the contexts and its associated options.
+.sp
+Using this function, you can name the new context and its authorized
+options and determine their main characteristics with a syntax easy
+to understand.
+If they already exist in another context, then they must have the same
+signature (described below) as in their previous appearance.
+.sp
+\fIname\fP is the name of the new context and \fIopts_specs\fP must contain a
+description of the options allowed in this context.
+.sp
+\fIopts_specs\fP is a string containing various components separated by
+spaces according to the syntax below:
+.INDENT 2.0
+.TP
+.B opt
+A mandatory option named opt without parameter usable only one type in
+the context
+.TP
+.B opt1 opt2
+Two mandatory option named \fBopt1\fP and \fBopt2\fP without argument.
+.TP
+.B opt...
+Same as above but can appear multiple time in the context.
+.TP
+.B [opt...]
+Same as above but the option is optional
+.TP
+.B opt1 [opt2...]
+One mandatory and one optional option named \fBopt1\fP and \fBopt2\fP
+without argument. \fBopt2\fP can appear multiple times in the context.
+.TP
+.B opt #
+One mandatory option named \fBopt*\fP taking one mandatory argument.
+.TP
+.B opt #tag
+One mandatory option named \fBopt\fP taking one mandatory argument.
+\fBtag\fP is ignored but can be used to improve the readability.
+.TP
+.B opt [#]
+One mandatory option named \fBopt\fP taking one optional argument.
+.TP
+.B opt #...
+One mandatory option named \fBopt\fP taking one or more mandatory
+arguments.
+.TP
+.B opt>ctx... [#<value>]
+The mandatory multiple option named \fBopt\fP will switch to the
+context named \fBcxt\fP which will become the new current context.
+.sp
+It takes an optional argument with a tag named \fB<value>\fP\&.
+.TP
+.B [opt... [#...]]
+One optional option named \fBopt\fP taking multiple optional
+arguments.
+.TP
+.B opt...<3 #...=3
+The mandatory option \fBopt\fP is restricted to only appear one or
+two times in the context.
+The number of its mandatory arguments must be exactly three.
+.UNINDENT
+.sp
+The multiplicity or not of the options and argument, their mandatory or
+optional characteristics constitutes their signatures.s
+.sp
+As said above, an option can appear in more than one context but must
+have the same signature.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_new_ctx("context1",
+               "[opt1>context2...] #arg1... [opt3]");
+
+ctxopt_new_ctx("context2",
+               "[opt2 [#arg2]] [opt3]");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In the previous example, three options \fBopt1\fP, \fBopt2\fP and \fBopt3\fP
+are defined.
+.INDENT 2.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B opt1
+is mandatory and can appear more than one time and take multiple
+mandatory arguments.
+.TP
+.B opt2
+is optional and take an optional argument.
+.TP
+.B opt3
+is optional and take no argument.
+Note that \fBopt3\fP is legal in both contexts.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.sp
+\fBopt2\fP, if present in the command line, will be evaluated in the
+context \fBcontext2\fP\&.
+Note that, in this example, the \fBcontext2\fP can only be entered if
+\fBopt1\fP has previously been seen in the command line.
+Hence, \fBopt2\fP is only legal if \fBopt1\fP is present first.
+.sp
+\fBopt3\fP does not have this limitation.
+In fact, as \fBopt3\fP is optional in \fBcontext2\fP and if its action
+function is not interested in the name of the current context,
+then it could have been omitted from the second setting thanks to
+the backtracking: an option which is illegal in a context is retried
+in the previous context in the hierarchy.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_ctx_disp_usage(char *\fP \fIctx_name\fP\fB, usage_behaviour\fP \fIaction\fP\fB);\fP
+.sp
+This function builds and prints an usage help text for the
+specific context \fIctx_name\fP\&.
+The symbols used in this text are the same as those used when defining
+options in \fBctxopt_new_ctx\fP\&.
+.sp
+The parameter \fIaction\fP can take the following values:
+.INDENT 2.0
+.TP
+.B continue_after
+The program is not stopped when this function returns.
+.TP
+.B exit_after
+The program is stopped with a non zero return code (typically 1)
+when this function returns.
+.UNINDENT
+.sp
+The usage text is followed by a legend explaining the symbols meanings.
+This function is useful when associated with a \fBhelp\fP or \fBusage\fP
+option.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_disp_usage(usage_behaviour\fP \fIaction\fP\fB);\fP
+.sp
+This function is similar to the preceding one but displays the usage
+help text for all the defined contexts.
+It is useful when associated with a general \fBhelp\fP or \fBusage\fP
+option.
+.sp
+The parameter \fIaction\fP can take the following values:
+.INDENT 2.0
+.TP
+.B continue_after
+The program is not stopped when this function returns.
+.TP
+.B exit_after
+The program is stopped with a non zero return code (typically 1)
+when this function returns.
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_add_global_settings(settings\fP \fIs\fP\fB,\fP \fI\&...\fP\fB);\fP
+.sp
+This function allows to set general \fBctxopt\fP settings.
+As for now, the only possible setting for \fIs\fP is \fBerror_functions\fP\&.
+.sp
+This setting tells \fBctxopt_add_global_settings\fP to use the rest of
+its arguments in order to replace the built\-in error functions with
+custom ones.
+.sp
+When the value of the first parameter is \fBerror_functions\fP,
+then the second one must be one of the following constants:
+.INDENT 2.0
+.TP
+.B CTXOPTMISPAR
+A mandatory parameter is missing.
+.TP
+.B CTXOPTUNKPAR
+A given parameter is unknown in the current context.
+.TP
+.B CTXOPTDUPOPT
+An option has been seen more than once but has not been declared as
+multiple in the context.
+.TP
+.B CTXOPTINCOPT
+An option is incompatible with an option already given in the context.
+.TP
+.B CTXOPTMISARG
+A mandatory argument is missing.
+.TP
+.B CTXOPTCNTEOPT, CTXOPTCNTLOPT and CTXOPTCNTGOPT
+The number of occurrences is not equal, lower or greater than a
+given value.
+.TP
+.B CTXOPTCNTEARG, CTXOPTCNTLARG and CTXOPTCNTGARG
+The number of arguments of an option is not equal, lower or greater
+than a given value.
+.UNINDENT
+.sp
+and the third parameter is a function pointer with the following
+prototype:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void (*) (errors err, state_t * state);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fIstate\fP will point to the publicly available analysis state structure.
+This structure contains a snapshot of variables related to the command
+line analysis so far.
+They and can be used to give the user clues about errors.
+.sp
+This structure available in \fBctxopt.h\fP is:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+typedef struct
+{
+  char * prog_name;        /* base name of the program name.         */
+  char * ctx_name;         /* current context name.                  */
+  char * ctx_par_name;     /* parameter which led to this context.   */
+  char * opt_name;         /* current option name.                   */
+  char * opt_params;       /* all parameters of the current option.  */
+  int    opts_count;       /* limit of the number of occurrences of  *
+                           |  the current option.                    */
+  int opt_args_count;      /* limit of the number of parameters of   *
+                           |  the current option.                    */
+  char * pre_opt_par_name; /* parameter just before the current one. */
+  char * cur_opt_par_name; /* current parameter.                     */
+} state_t;
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+All these pointers can be equal to the \fBNULL\fP pointer.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_add_global_settings(error_functions, CTXOPTMISPAR, error);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_add_ctx_settings(settings\fP \fIs\fP\fB,\fP \fI\&...\fP\fB);\fP
+.sp
+This function manages some settings for a given context.
+Its first parameter \fIs\fP determines the setting and the signification
+of the remaining arguments.
+.sp
+Its possible values are:
+.INDENT 2.0
+.TP
+.B incompatibilities:
+This setting allows to declare a set of options incompatible with
+each other.
+.sp
+In this case the second argument must be a context name and the
+third argument must be a string containing option names separated
+by a space.
+.sp
+Example of \fBincompatibilities\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void ctxopt_add_ctx_settings(incompatibilities,
+                             context1,
+                             "opt1 opt2 opt3");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+The three options named \fBopt1\fP, \fBopt2\fP and \fBopt3\fP will be
+marked as mutually incompatibles in each instance of the context
+\fBcontext1\fP\&.
+.TP
+.B actions:
+This setting allows to associate a function to the context.
+.sp
+The second argument (called \fIf\fP below) will be called as soon as the
+context is entered or exited during the evaluation phase.
+.sp
+The next parameters must be pointers to arbitrary data which may
+be used by \fIf\fP\&.
+.sp
+In this setting, the last parameter must be \fBNULL\fP\&.
+.sp
+\fIf\fP must have the following prototype:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+int (*) (char     * name1,   /* Context name */
+         direction  status,  /* entering or exiting */
+         char     * name2,   /* previous or next context */
+         int        nb_data, /* Number of data */
+         void    ** data     /* Data */);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This function \fIf\fP will be called when entering \fBAND\fP exiting
+the context.
+Its arguments will then be set to:
+.INDENT 7.0
+.TP
+.B \fIname1\fP
+the name of the context.
+.TP
+.B \fIstatus\fP
+will be \fBentering\fP when entering the context and \fBexiting\fP
+when exiting the context.
+.TP
+.B \fIname2\fP
+according to the content of \fIstatus\fP, the name of the context we
+are coming from or the name of the context we are returning to.
+.sp
+\fIname2\fP can be \fBNULL\fP if we are entering in the main context or
+are leaving it.
+.TP
+.B \fInb_data\fP
+The number of data pointers passed to the \fBctxopt_add_ctx_settings\fP
+function after the \fIs\fP parameter.
+.TP
+.B \fIdata\fP
+The data pointers passed to the \fBctxopt_add_ctx_settings\fP function
+after the \fIs\fP parameter and arranged in an array of \fInb_data\fP
+.UNINDENT
+.sp
+Example of \fBactions\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void ctxopt_add_ctx_settings(actions,
+                             "context1",
+                             action,
+                             &data_1, &data_2, &data_3,
+                             NULL);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This function call registers the \fBaction\fP function to the context
+named \fBcontext1\fP\&.
+.sp
+The action function will be called \fBafter\fP entering to and
+\fBbefore\fP exiting from each instance of the context
+named \fBcontext1\fP\&.
+.sp
+The optional \fIdata_X\fP pointers will be passed to \fBaction\fP through
+its data pointer to allow it to manipulate them if needed.
+The count of these pointers (3 here) will also be passed to action
+through its \fInb_data\fP parameter.
+.sp
+The ending \fBNULL\fP is mandatory.
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_add_opt_settings(settings\fP \fIs\fP\fB, char *\fP \fIopt\fP\fB,\fP \fI\&...\fP\fB);\fP
+.sp
+This function manages some settings for an option whose name is given in
+\fIopt\fP\&.
+.sp
+The first parameter \fIs\fP determines the exact setting and the
+signification of the remaining arguments.
+Its possible values are:
+.INDENT 2.0
+.TP
+.B parameters
+This setting allows to associate command line parameters with \fIopt\fP\&.
+The set of parameters must be given in the third argument as a string
+containing words separated by blanks.
+.sp
+Each appearance of one of these parameters in the command line will
+trigger the action associated with the named option.
+.sp
+Each of these words must start with one and exactly one dash.
+.sp
+Example of \fBparameters\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_add_opt_settings(parameters,
+                        "opt1",
+                        "\-p \-parm \-p1");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In this example, \fBopt1\fP is the name of a previously defined option and
+\fB\-p\fP, \fB\-parm\fP and \fB\-p1\fP will be three valid command line
+parameters for the option \fBopt1\fP\&.
+.TP
+.B actions
+This setting allows to associate a function to this options.
+As said above, this function will be called each time the option will be
+recognized when evaluating the command line.
+.sp
+The function pointer must be given as the third argument.
+.sp
+Following the function pointer, it is possible to add a bunch of
+other parameters which must be pointers to some pre\-allocated arbitrary
+data.
+.sp
+These pointers will be passed to the function when called.
+The last parameter must be \fBNULL\fP to end the sequence.
+.sp
+The function needs to be given as the third argument and must
+match the following prototype:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void (*) (char  * ctx_name,     /* Context name */
+          char  * opt_name,     /* Option name  */
+          char  * param,        /* Parameter name */
+          int     nb_values,    /* Number of arguments */
+          char ** values,       /* Arguments */
+          int     nb_opt_data,  /* Number of option data passed */
+          void ** opt_data,     /* Array of option data passed */
+          int     nb_ctx_data,  /* Number of context data passed */
+          void ** ctx_data      /* Array of context data passed */)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.INDENT 7.0
+.TP
+.B \fIctx_name\fP
+is the name of the current context.
+.TP
+.B \fIopt_name\fP
+is the name of the option.
+.TP
+.B \fIparam\fP
+is the name of the parameter that triggered the option \fIopt_name\fP\&.
+.TP
+.B \fInb_values\fP
+is the number of arguments immediately following this option in
+the command line.
+.TP
+.B \fIvalues\fP
+is an array of stings containing the arguments following this
+option in the command line.
+.TP
+.B \fInb_opt_data\fP
+is the number of data pointers which were given after the third
+arguments of \fBctxopt_add_opt_settings\fP\&.
+.TP
+.B \fIopt_data\fP
+The data pointers passed after the third arguments of
+\fBctxopt_add_opt_settings\fP and reorganized as an array of
+\fInb_opt_data\fP elements.
+.sp
+The aim is to be able to consult/alter options specific data.
+.TP
+.B \fInb_ctx_data\fP
+Same as \fInb_opt_data\fP but referencing to the number of data
+pointers given to \fBctxopt_add_ctx_settings\fP for the current
+context after its third argument.
+.TP
+.B \fIctx_data\fP
+are the data pointers given to \fBctxopt_add_ctx_settings\fP for the
+current context after its third argument.
+.sp
+The aim is to be able to consult/alter contexts specific data.
+.UNINDENT
+.sp
+Example of \fBactions\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void action(char * ctx_name,
+            char * opt_name,
+            char * param,
+            int    nb_values,   char ** values,
+            int    nb_opt_data, void ** opt_data,
+            int    nb_ctx_data, void ** ctx_data)
+{
+  \&...
+}
+
+\&...
+
+void ctxopt_add_opt_settings(actions, "opt1", action,
+                             &data_1, &data_2, &data_3,
+                             NULL);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This example associates the function \fIaction\fP to the option \fBopt1\fP\&.
+.sp
+Here, the \fIdata_*\fP pointers will be accessible to the function
+\fIaction\fP when called through its argument \fIopt_data\fP and their number
+(3 here) through its argument \fInb_opt_data\fP as mentioned above.
+.sp
+\fIaction\fP will also have access to the current context data in the
+same way through its arguments \fIctx_data\fP and \fInb_ctx_data\fP\&.
+.sp
+The \fIaction\fP argument \fIparam\fP will receive the value of the specific
+parameter which triggered it \- one of the parameters registered with
+\fBctxopt_add_opt_settings\fP\&.
+.TP
+.B constraints
+This setting registers a function whose responsibility is to validate
+that the arguments of the option respect some constraints.
+.sp
+To do that the third argument must be a function pointer and the fourth
+argument must be some arbitrary parameter to this function needed
+to validate the constraint.
+.sp
+The constraint function must match the following prototype:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+int (*) (int nb_args, char ** args, char * value);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Where:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B \fInb_args\fP
+is the number which will be set to the number of arguments fol\-
+lowing the command line parameter.
+.TP
+.B \fIargs\fP
+is an array of nb_args strings containing theses arguments.
+.TP
+.B \fIvalue\fP
+is an arbitrary string containing the constraints which must be
+respected by args.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+Three constraint functions are built\-in and are described below.
+They give examples on how to build them.
+.sp
+Example of constraint function using the built\-it regular expression
+constraint checker function:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_add_opt_settings(constraints,
+                        "opt1",
+                        ctxopt_re_constraint,
+                        "[^:]+:.+");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In this example all the arguments of the option \fBopt1\fP must match
+the extended regular expression:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+[^:]+:.+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+See below for details about the function \fBctxopt_re_constraint\fP\&.
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBint ctxopt_format_constraint(int\fP \fInb_args\fP\fB, char **\fP \fIargs\fP\fB, char *\fP \fIvalue\fP\fB);\fP
+.sp
+This pre\-defined constraint function checks whether the arguments
+in \fIargs\fP respect a C printf format given in value, \fI%2d\fP by e.g.
+It returns 1 if the checking is successful and 0 if not.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBint ctxopt_re_constraint(int\fP \fInb_args\fP\fB, char **\fP \fIargs\fP\fB, char *\fP \fIvalue\fP\fB);\fP
+.sp
+Another pre\-defined constraint function which checks if the arguments
+of an option respects the extended regular expression given in \fIvalue\fP\&.
+.sp
+It returns 1 if the arguments respects the constraint and 0 if this
+is not the case.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBint ctxopt_range_constraint(int\fP \fInb_args\fP\fB, char **\fP \fIargs\fP\fB, char *\fP \fIvalue\fP\fB);\fP
+.sp
+Yet another pre\-defined constraint function. This one checks if the
+arguments of an option are in in a specified ranges.
+.sp
+\fIvalue\fP must contain a string made of a maximum of 2 long integers
+separated by spaces.
+.sp
+The first or the second of these numbers can be replaced with the
+character \(aq\fI\&.\fP\(aq. In this case only the minimum or maximum is checked
+and the \(aq\fI\&.\fP\(aq equals to plus or minus infinity depending of this
+place in the string.
+.sp
+It returns 1 if the arguments respects the constraint and 0 if this
+is not the case.
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_analyze(int\fP \fInb_words\fP\fB, char **\fP \fIwords\fP\fB, int *\fP \fIrem_count\fP\fB, char ***\fP \fIrem_args\fP\fB);\fP
+.sp
+This function processes the registered contexts instances tree, detects
+errors and possibly reorganizes the options order according
+to given priorities.
+.sp
+The first two arguments are similar to the \fIargc\fP and \fIargv\fP arguments
+of the main function but without counting \fIargv[0]\fP\&.
+Therefore, in many cases, \fInb_words\fP will have the value of \fIargc\-1\fP
+and \fIwords\fP will have the value of \fIargv+1\fP\&.
+.sp
+The last two will receive the number of remaining (non analyzed)
+command line words and the array of these remaining words.
+Remaining words can be words appearing after \fB\-\-\fP per example.
+.sp
+All errors are fatal and terminates the program with a return code
+greater then 0.
+.sp
+Example:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+int     res_argc;
+char ** res_argv;
+\&...
+ctxopt_analyze(argc\-1, argv+1, &res_argc, &res_argv);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.nf
+
+.fi
+.sp
+.INDENT 0.0
+.IP \(bu 2
+\fBvoid ctxopt_evaluate(void);\fP
+.sp
+This function walks through the tree of context instances previously
+built by \fBctxopt_analyze\fP and launches the action attached to
+each options, if any, one after the other.
+.UNINDENT
+.\" Generated by docutils manpage writer.
+.
