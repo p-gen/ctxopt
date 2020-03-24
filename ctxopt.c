@@ -70,9 +70,11 @@ typedef enum
   leaf
 } walk_order_e;
 
+#if 0 /* Unused yet */
 static void *
 bst_delete(const void * vkey, void ** vrootp,
            int (*compar)(const void *, const void *));
+#endif
 
 static void
 bst_destroy_recurse(bst_t * root, void (*free_action)(void *));
@@ -117,8 +119,10 @@ ll_insert_before(ll_t * const list, ll_node_t * node, void * const data);
 static int
 ll_delete(ll_t * const list, ll_node_t * node);
 
+#if 0 /* Unused yet */
 static ll_node_t *
 ll_find(ll_t * const, void * const, int (*)(const void *, const void *));
+#endif
 
 static void
 ll_init(ll_t * list);
@@ -177,9 +181,6 @@ par_compare(const void * a1, const void * a2);
 
 static int
 seen_opt_compare(const void * so1, const void * so2);
-
-static int
-str_compare(const void * s1, const void * s2);
 
 static ctx_t *
 locate_ctx(char * name);
@@ -697,6 +698,7 @@ ll_delete(ll_t * const list, ll_node_t * node)
   return 1;
 }
 
+#if 0 /* Unused yet */
 /* =========================================================================*/
 /* Find a node in the list containing data. Return the node pointer or NULL */
 /* if not found.                                                            */
@@ -719,6 +721,7 @@ ll_find(ll_t * const list, void * const data,
 
   return NULL;
 }
+#endif
 
 /* ==================================================================== */
 /* Allocates and fills an array of strings from a list                  */
@@ -783,6 +786,7 @@ struct bst_s
   struct bst_s * rlink;
 };
 
+#if 0 /* Unused yet */
 /* ========================== */
 /* delete node with given key */
 /* ========================== */
@@ -829,6 +833,7 @@ bst_delete(const void * vkey, void ** vrootp,
   *rootp = q;     /* link parent to new node */
   return p;
 }
+#endif
 
 /* ============== */
 /* destroy a tree */
@@ -1356,12 +1361,6 @@ seen_opt_compare(const void * so1, const void * so2)
   o2 = ((seen_opt_t *)so2)->opt;
 
   return strcmp(o1->name, o2->name);
-}
-
-static int
-str_compare(const void * s1, const void * s2)
-{
-  return strcmp((char *)s1, (char *)s2);
 }
 
 /* ******************************************************************** */
