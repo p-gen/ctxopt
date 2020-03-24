@@ -2,9 +2,9 @@
 ctxopt
 ======
 
---------------------------------------
-Advanced command line options manager.
---------------------------------------
+-----------------------------------------
+An advanced command line options manager.
+-----------------------------------------
 
 DESCRIPTION
 ===========
