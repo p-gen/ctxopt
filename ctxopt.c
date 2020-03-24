@@ -2297,6 +2297,7 @@ ctxopt_init(char * prog_name)
   char * ptr;
 
   user_rc      = 0;
+  user_value   = 0;
   user_string  = xmalloc(8);
   user_string2 = xmalloc(8);
   user_object  = NULL;
