@@ -1,19 +1,20 @@
-OBJS    = hello.o ctxopt.o
-SOURCE  = hello.c ctxopt.c
-HEADER  = ctxopt.h
+OBJS    = hello.o example1.o ctxopt.o
+BINS    = hello example1
 OUT     = hello
 CC      = c99
-FLAGS   = -g
-LFLAGS  =
+CFLAGS  = -g
+LDFLAGS =
 
-all: $(OBJS)
-	$(CC) $(OBJS) -o $(OUT) $(LFLAGS)
+all: hello example1
 
-hello.o: hello.c
-	$(CC) -c $(FLAGS) hello.c
+hello: hello.c ctxopt.o
+	$(CC) $(CFLAGS) -o hello hello.c ctxopt.o $(LDFLAGS)
+
+example1: example1.c ctxopt.o
+	$(CC) $(CFLAGS) -o example1 example1.c ctxopt.o $(LDFLAGS)
 
 ctxopt.o: ../ctxopt.c
-	$(CC) -c $(FLAGS) ../ctxopt.c
+	$(CC) $(CFLAGS) -c ../ctxopt.c
 
 clean:
-	rm -f $(OBJS) $(OUT)
+	rm -f $(OBJS) $(BINS)
