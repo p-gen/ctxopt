@@ -274,6 +274,7 @@ fatal_internal(const char * format, ...)
 /*                                                                        */
 /*          CTXOPTMISPAR Missing parameter                                */
 /*          CTXOPTMISARG Missing argument                                 */
+/*          CTXOPTUXPARG Unexpected argument                              */
 /*          CTXOPTDUPOPT Duplicated option                                */
 /*          CTXOPTUNKPAR Unknown parameter                                */
 /*          CTXOPTINCOPT Incompatible option                              */
@@ -309,6 +310,11 @@ fatal(errors e, char * errmsg)
                   errmsg);
 
         free(errmsg);
+        break;
+
+      case CTXOPTUNXARG:
+        fprintf(stderr, "%s only takes one argument.\n",
+                cur_state->cur_opt_par_name);
         break;
 
       case CTXOPTMISARG:
@@ -3144,9 +3150,29 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
       }
     }
     else if (expect_par && *par_name != '-')
-      break; /* a unexpected non parameter was seen, assume it is the end *
-              | of parameters and the start of non ctxopt managed command *
-              | line arguments.                                           */
+    {
+      ll_node_t * n = cli_node->next;
+
+      /* Look if potential arguments must still be analyzed until the  */
+      /* end of the context/command line part to analyze/command line. */
+      /* If this is the case we have met an extra argument.            */
+      /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+      while (n != NULL)
+      {
+        if (strcmp(n->data, "--") == 0 || strcmp(n->data, "\x1d") == 0)
+          fatal(CTXOPTUNXARG, NULL);
+
+        if (*(char *)(n->data) == '-')
+          fatal(CTXOPTUNXARG, NULL);
+
+        n = n->next;
+      }
+
+      break; /* an unexpected non parameter was seen, if no Potential *
+              | arguments remain in the command line assume that it   *
+              | is is the first of the non arguments and stop the     *
+              | command line analysis.                                */
+    }
     else if (expect_arg && *par_name != '-')
     {
       ll_node_t *    cstr_node;
