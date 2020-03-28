@@ -2991,7 +2991,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
               errmsg = strappend(
                 errmsg,
                 "\nIt appears to be defined in the context(s):", user_string2,
-                "\nAdd -h or -H for more help.", NULL);
+                "\n", NULL);
             }
 
             fatal(CTXOPTUNKPAR, errmsg);
