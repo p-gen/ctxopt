@@ -1,3 +1,11 @@
+/* ########################################################### */
+/* This Software is licensed under the GPL licensed Version 2, */
+/* please read http://www.gnu.org/copyleft/gpl.html            */
+/* ########################################################### */
+
+#ifndef CTXOPT_H
+#define CTXOPT_H
+
 typedef enum
 {
   parameters,
@@ -87,3 +95,5 @@ ctxopt_re_constraint(int nb_args, char ** args, char * value);
 
 int
 ctxopt_range_constraint(int nb_args, char ** args, char * value);
+
+#endif
