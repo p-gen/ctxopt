@@ -3321,6 +3321,13 @@ evaluate_ctx_inst(ctx_inst_t * ctx_inst)
 
   ctx = ctx_inst->ctx;
 
+  /* Do not evaluate the action attached to this context is there is no */
+  /* option to evaluate.                                                */
+  /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+  opt_inst_node = ctx_inst->opt_inst_list->head;
+  if (opt_inst_node == NULL)
+    return;
+
   /* Call the entering action attached to this context if any */
   /* """""""""""""""""""""""""""""""""""""""""""""""""""""""" */
   if (ctx->action != NULL)
@@ -3334,7 +3341,6 @@ evaluate_ctx_inst(ctx_inst_t * ctx_inst)
 
   /* For each instance of options */
   /* """""""""""""""""""""""""""" */
-  opt_inst_node = ctx_inst->opt_inst_list->head;
   while (opt_inst_node != NULL)
   {
     opt_inst = (opt_inst_t *)(opt_inst_node->data);

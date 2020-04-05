@@ -353,6 +353,9 @@ The API consists in the following functions:
     The second argument (called *f* below) will be called as soon as the
     context is entered or exited during the evaluation phase.
 
+    Note that *f* will NOT be called if the context is empty
+    (does not contain any option).
+
     The next parameters must be pointers to arbitrary data which may
     be used by *f*.
 

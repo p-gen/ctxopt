@@ -420,6 +420,9 @@ This setting allows to associate a function to the context.
 The second argument (called \fIf\fP below) will be called as soon as the
 context is entered or exited during the evaluation phase.
 .sp
+Note that \fIf\fP will NOT be called if the context is empty
+(does not contain any option).
+.sp
 The next parameters must be pointers to arbitrary data which may
 be used by \fIf\fP\&.
 .sp
