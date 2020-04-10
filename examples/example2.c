@@ -153,8 +153,8 @@ main(int argc, char * argv[])
   ctxopt_new_ctx("second", "[b>third [#<string>]]");
   ctxopt_new_ctx("third", "[c #<string>]");
 
-  /* Attach parameters to the options */
-  /* """""""""""""""""""""""""""""""" */
+  /* Attach parameters to options */
+  /* """""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(parameters, "a", "-a");
   ctxopt_add_opt_settings(parameters, "b", "-b");
   ctxopt_add_opt_settings(parameters, "c", "-c");
@@ -163,8 +163,8 @@ main(int argc, char * argv[])
   /* """""""""""""""""""""""""""""""""""""""""""""" */
   ctxopt_add_ctx_settings(actions, "second", second_action, &ctx_data, NULL);
 
-  /* Attach a callback action to the options */
-  /* """"""""""""""""""""""""""""""""""""""" */
+  /* Attach a callback action to options */
+  /* """"""""""""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(actions, "a", opt_action, NULL);
   ctxopt_add_opt_settings(actions, "b", opt_action, &opt_data, NULL);
   ctxopt_add_opt_settings(actions, "c", opt_action, NULL);
@@ -173,8 +173,8 @@ main(int argc, char * argv[])
   /* """""""""""""""""""""""""""""""""""""""" */
   ctxopt_analyze(argc - 1, argv + 1, &nb_rem_args, &rem_args);
 
-  /* Execute the callback actions in sequence */
-  /* """""""""""""""""""""""""""""""""""""""" */
+  /* Execute callback actions in sequence */
+  /* """""""""""""""""""""""""""""""""""" */
   ctxopt_evaluate();
 
   /* Print remaining non-arguments if any */

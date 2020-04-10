@@ -38,22 +38,22 @@ main(int argc, char * argv[])
   int     nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
   char ** rem_args    = NULL; /* Remaining arguments string array.      */
 
-  /* initialize cop */
-  /* """""""""""""" */
+  /* initialize ctxopt */
+  /* """"""""""""""""" */
   ctxopt_init(argv[0]);
 
-  /* Create a new context with their allowed options */
-  /* """"""""""""""""""""""""""""""""""""""""""""""" */
+  /* Create new contexts with their allowed options */
+  /* """""""""""""""""""""""""""""""""""""""""""""" */
   ctxopt_new_ctx("main", "[user>ctx1... #<string>]");
   ctxopt_new_ctx("ctx1", "group #<string>...");
 
-  /* Attach parameters to the options */
-  /* """""""""""""""""""""""""""""""" */
+  /* Attach parameters to options */
+  /* """""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(parameters, "user", "-u -user");
   ctxopt_add_opt_settings(parameters, "group", "-g -groups");
 
-  /* Attach a callback action to the options */
-  /* """"""""""""""""""""""""""""""""""""""" */
+  /* Attach a callback action to options */
+  /* """"""""""""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(actions, "user", user_action, NULL);
   ctxopt_add_opt_settings(actions, "group", groups_action, NULL);
 
@@ -61,8 +61,8 @@ main(int argc, char * argv[])
   /* """""""""""""""""""""""""""""""""""""""" */
   ctxopt_analyze(argc - 1, argv + 1, &nb_rem_args, &rem_args);
 
-  /* Execute the callback actions in sequence */
-  /* """""""""""""""""""""""""""""""""""""""" */
+  /* Execute registered actions in sequence */
+  /* """""""""""""""""""""""""""""""""""""" */
   ctxopt_evaluate();
 
   exit(EXIT_SUCCESS);
