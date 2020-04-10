@@ -1,5 +1,5 @@
-ctxopt: yet another command line options manager.
-#################################################
+**ctxopt**: yet another command line options manager.
+#####################################################
 
 |
 
@@ -7,16 +7,17 @@ For many uses, the traditional getopt function is enough to parse the
 options in command lines.
 
 However, cases exist where getopt shows its limits.
-ctxopt is able to manage complex configurations of command line options and
-excels when they appear in structured or independent blocs.
+**ctxopt** is able to manage complex configurations of command line
+options and excels when they appear in structured or independent blocs.
 
-ctxopt  uses another (better) approach to manage these simple and complex
-command lines: options are grouped in contexts, hence the ctx in ctxopt.
+**ctxopt**  uses another (better) approach to manage these simple and
+complex command lines: options are grouped in contexts, hence the ctx
+in **ctxopt**.
 
 Features:
 ---------
 
-Its main features are:
+**ctxopt** has many features, its main ones are:
 
 - Options are organized in a hierarchy of contexts.
 - Any number of parameters can be assigned to each option.
@@ -37,19 +38,60 @@ Its main features are:
 - Command lines options are evaluated in order but some options can be
   forced to be evaluated first though.
 
+Context notion illustrated by a tiny example:
+---------------------------------------------
+
+Imagine a situation where you want an option to be allowed only if
+another option was previously given.
+
+For example, you want the *group* option to be allowed only after
+a *user* option.
+
+With **ctxopt** its easy, you just have to define two contexts (at least one
+is mandatory), tell the *user* option to switch to the second context
+(named ``ctx1`` here) and define the *group* option in the second context.
+
++------------------+-----------------+--------------+-------------------+
+| Defined contexts | Allowed options | Next context | Option parameters |
++==================+=================+==============+===================+
+| ``main``         | user            | ``ctx1``     | ``-u`` ``-user``  |
++------------------+-----------------+--------------+-------------------+
+| ``ctx1``         | group           |              | ``-g`` ``-group`` |
++------------------+-----------------+--------------+-------------------+
+
+According to the situation summarized in this table, the following
+command line (subscripted context changes are only there to facilitate
+understanding)
+
+.. parsed-literal::
+  prog\ :sub:`main` -u\ :sub:`ctx1`\  u1 -g g1 g2 \
+  -user\ :sub:`ctx1`\  u2 -group g3
+
+will be understood as:
+
+.. parsed-literal::
+  Context main:  prog -u u1          -user u2
+  Context ctx1:             -g g1 g2          -group g3
+
+In this example, you can see that the previous context (``main`` here) is
+automatically re-entered after the analysis of the *group* option because
+the *user* option is unknown in the ``ctx1`` context.
+
+See the file **example1.c** in the **examples** directory for details.
+
 Usage:
 ------
 
-To use ctxopt, the users must at least:
+To use **ctxopt**, the users must at least:
 
 - include **ctxopt.h** and **ctxopt.c** in his code.
 - define at least one context and describe its options.
 - set at least one parameter's name for the options described in the contexts.
 - write and attach an action callback function to each options.
 - possibly register constraint and other things (optional).
-- call ctxopt_init.
-- call ctxopt_analyze.
-- call ctxopt_evaluate.
+- call ``ctxopt_init``.
+- call ``ctxopt_analyze``.
+- call ``ctxopt_evaluate``.
 
 Optional steps include:
 
