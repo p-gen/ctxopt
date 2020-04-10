@@ -60,12 +60,11 @@ is mandatory), tell the *user* option to switch to the second context
 +------------------+-----------------+--------------+-------------------+
 
 According to the situation summarized in this table, the following
-command line (subscripted context changes are only there to facilitate
-understanding)
+command line (the context changes in brackets have been added only for
+understanding and not part of the command line)
 
 .. parsed-literal::
-  prog\ :sub:`main` -u\ :sub:`ctx1`\  u1 -g g1 g2 \
-  -user\ :sub:`ctx1`\  u2 -group g3
+  prog[main] -u[ctx1] u1 -g g1 g2 -user[ctx1] u2 -group g3
 
 will be understood as:
 
