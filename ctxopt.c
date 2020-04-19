@@ -347,7 +347,6 @@ fatal(errors e, char * errmsg)
       case CTXOPTUNKPAR:
         fprintf(stderr, "Unknown parameter: %s.\n",
                 cur_state->cur_opt_par_name);
-        fprintf(stderr, errmsg);
         break;
 
       case CTXOPTINCOPT:
