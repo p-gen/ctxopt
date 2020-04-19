@@ -1685,12 +1685,6 @@ match_prefix_cb(const void * node, walk_order_e kind, int level)
     }
 }
 
-static void
-bst_null_action(void * data)
-{
-  ; /* nothing to do */
-}
-
 /* ====================================================================== */
 /* A parameter may not be separated from its first option by spaces, in   */
 /* this case this function looks for a valid flag as a prefix and splits  */
@@ -1788,8 +1782,11 @@ abbrev_expand(char * par_name, ctx_t * ctx)
       s = strtok(NULL, " ");
     }
 
+    /* Clean the temporary bst without removing the pointer */
+    /* to the real options.                                 */
+    /* """""""""""""""""""""""""""""""""""""""""""""""""""" */
     if (tmp_opt_bst != NULL)
-      bst_destroy(tmp_opt_bst, bst_null_action);
+      bst_destroy(tmp_opt_bst, NULL);
 
     if (opt_count == 1)
       /* All the abbreviation lead to only one option   */
