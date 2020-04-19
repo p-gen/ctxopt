@@ -894,7 +894,7 @@ bst_find(const void * vkey, void * const * vrootp,
 /* find or insert datum into search tree */
 /* ===================================== */
 static void *
-bst_search(const void * vkey, void ** vrootp,
+bst_search(void * vkey, void ** vrootp,
            int (*compar)(const void *, const void *))
 {
   bst_t *  q;
@@ -916,9 +916,9 @@ bst_search(const void * vkey, void ** vrootp,
 
   q = xmalloc(sizeof(bst_t)); /* T5: key not found */
   if (q != 0)
-  {                          /* make new node */
-    *rootp   = q;            /* link new node to old */
-    q->key   = (void *)vkey; /* initialize new node */
+  {                  /* make new node */
+    *rootp   = q;    /* link new node to old */
+    q->key   = vkey; /* initialize new node */
     q->llink = q->rlink = NULL;
   }
   return q;
