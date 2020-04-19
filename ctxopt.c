@@ -3199,8 +3199,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
       /* If the argument is valid, store it */
       /* """""""""""""""""""""""""""""""""" */
-      if (*par_name == '\\' && *(par_name + 1) != '\0'
-          && *(par_name + 1) == '-')
+      if (*par_name == '\\' && *(par_name + 1) == '-')
         ll_append(opt_inst->values_list, par_name + 1);
       else
         ll_append(opt_inst->values_list, par_name);
