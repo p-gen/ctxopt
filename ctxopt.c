@@ -3747,10 +3747,6 @@ ctxopt_add_opt_settings(settings s, ...)
         opt->params = xstrdup(params);
         while ((n = strcspn(opt->params, " \t")) < l)
           opt->params[n] = '|';
-
-        /* Update current_state */
-        /* -------------------- */
-        cur_state->opt_params = xstrdup(opt->params);
       }
 
       break;
