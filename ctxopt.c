@@ -1978,7 +1978,7 @@ opt_parse(char * s, opt_t ** opt)
     opt_optional = 1;
     s++;
   }
-  s = strtoken(s, token, sizeof(token), "[^] \n\t.]", &pos);
+  s = strtoken(s, token, sizeof(token) - 1, "[^] \n\t.]", &pos);
   if (s == NULL)
     return -1; /* empty string */
 
