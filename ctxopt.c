@@ -850,24 +850,20 @@ bst_delete(const void * vkey, void ** vrootp,
 /* destroy a tree */
 /* ============== */
 static void
-bst_destroy_recurse(bst_t * root, void (*free_action)(void *))
-{
-  if (root->llink != NULL)
-    bst_destroy_recurse(root->llink, free_action);
-  if (root->rlink != NULL)
-    bst_destroy_recurse(root->rlink, free_action);
-
-  (*free_action)((void *)root->key);
-  free(root);
-}
-
-static void
-bst_destroy(void * vrootp, void (*freefct)(void *))
+bst_destroy(void * vrootp, void (*clean)(void *))
 {
   bst_t * root = (bst_t *)vrootp;
 
-  if (root != NULL)
-    bst_destroy_recurse(root, freefct);
+  if (root == NULL)
+    return;
+
+  bst_destroy(root->llink, clean);
+  bst_destroy(root->rlink, clean);
+
+  if (clean)
+    clean((void *)root->key);
+
+  free(root);
 }
 
 /* ======================== */
