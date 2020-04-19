@@ -704,6 +704,8 @@ ll_delete(ll_t * const list, ll_node_t * node)
 
   --list->len;
 
+  free(node);
+
   return 1;
 }
 
