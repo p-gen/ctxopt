@@ -6,6 +6,11 @@ ctxopt
 An advanced command line options manager.
 -----------------------------------------
 
+:Author: Pierre Gentile p.gen.progs@gmail.com
+:Date: 2020
+:Copyright: GPLv2
+:Manual section: 3
+
 DESCRIPTION
 ===========
 
@@ -80,7 +85,7 @@ The API consists in the following functions:
   *opts_specs*\
   **);**
 
-  The next thing to do after having called **ctxopt_new_ctx** is to 
+  The next thing to do after having called **ctxopt_new_ctx** is to
   define the contexts and its associated options.
 
   Using this function, you can name the new context and its authorized
@@ -143,7 +148,7 @@ The API consists in the following functions:
 
   The multiplicity or not of the options and argument, their mandatory or
   optional characteristics constitutes their signatures.s
-  
+
   As said above, an option can appear in more than one context but must
   have the same signature.
 
@@ -171,7 +176,7 @@ The API consists in the following functions:
       is optional and take no argument.
       Note that **opt3** is legal in both contexts.
 
-    | 
+    |
 
     **opt2**, if present in the command line, will be evaluated in the
     context **context2**.
@@ -194,7 +199,7 @@ The API consists in the following functions:
   *action*\
   **);**
 
-  This function builds and prints an usage help text for the 
+  This function builds and prints an usage help text for the
   specific context *ctx_name*.
   The symbols used in this text are the same as those used when defining
   options in **ctxopt_new_ctx**.
@@ -242,14 +247,14 @@ The API consists in the following functions:
 
   This function allows to set general **ctxopt** settings.
   As for now, the only possible setting for *s* is **error_functions**.
-  
+
   This setting tells **ctxopt_add_global_settings** to use the rest of
   its arguments in order to replace the built-in error functions with
   custom ones.
 
   When the value of the first parameter is **error_functions**,
   then the second one must be one of the following constants:
-     
+
   :CTXOPTMISPAR:
     A mandatory parameter is missing.
 
@@ -290,7 +295,7 @@ The API consists in the following functions:
 
   .. code-block:: c
 
-    typedef struct 
+    typedef struct
     {
       char * prog_name;        /* base name of the program name.         */
       char * ctx_name;         /* current context name.                  */
@@ -519,7 +524,7 @@ The API consists in the following functions:
 
     *nb_ctx_data*
        Same as *nb_opt_data* but referencing to the number of data
-       pointers given to **ctxopt_add_ctx_settings** for the current 
+       pointers given to **ctxopt_add_ctx_settings** for the current
        context after its third argument.
 
     *ctx_data*
@@ -573,7 +578,7 @@ The API consists in the following functions:
 
     .. code-block:: c
 
-       int (*) (int nb_args, char ** args, char * value);
+       int (*) (int nb_args, char ** args, char * value, char * parameter);
 
     Where:
 
@@ -587,6 +592,9 @@ The API consists in the following functions:
       *value*
         is an arbitrary string containing the constraints which must be
         respected by args.
+
+      *parameter*
+        is the parameter of which *value* is an argument.
 
     Three constraint functions are built-in and are described below.
     They give examples on how to build them.
@@ -604,7 +612,7 @@ The API consists in the following functions:
 
     In this example all the arguments of the option **opt1** must match
     the extended regular expression::
-    
+
       [^:]+:.+
 
     See below for details about the function **ctxopt_re_constraint**.
@@ -617,6 +625,8 @@ The API consists in the following functions:
   *args*\
   **, char *** \
   *value*\
+  **, char *** \
+  *parameter*\
   **);**
 
   This pre-defined constraint function checks whether the arguments
@@ -631,6 +641,8 @@ The API consists in the following functions:
   *args*\
   **, char *** \
   *value*\
+  **, char *** \
+  *parameter*\
   **);**
 
   Another pre-defined constraint function which checks if the arguments
@@ -647,6 +659,8 @@ The API consists in the following functions:
   *args*\
   **, char *** \
   *value*\
+  **, char *** \
+  *parameter*\
   **);**
 
   Yet another pre-defined constraint function. This one checks if the
