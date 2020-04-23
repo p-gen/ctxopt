@@ -3382,7 +3382,10 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
         cstr = cstr_node->data;
         if (!cstr->constraint(cstr->nb_args, cstr->args, par_name,
                               cur_state->cur_opt_par_name))
-          exit(EXIT_FAILURE);
+        {
+          fputs("\n", stderr);
+          ctxopt_ctx_disp_usage(cur_state->ctx_name, exit_after);
+        }
 
         cstr_node = cstr_node->next;
       }
@@ -3825,7 +3828,7 @@ ctxopt_range_constraint(int nb_args, char ** args, char * value, char * par)
     if (v < min)
     {
       fprintf(stderr,
-              " The argument %ld of %s is not greater or equal to "
+              "The argument %ld of %s is not greater than or equal to "
               "%ld as requested.",
               v, par, min);
       return 0;
@@ -3838,7 +3841,7 @@ ctxopt_range_constraint(int nb_args, char ** args, char * value, char * par)
     if (v > max)
     {
       fprintf(stderr,
-              "The argument %ld of %s is not lower or equal to "
+              "The argument %ld of %s is not less than or equal to "
               "%ld as requested.",
               v, par, max);
       return 0;
