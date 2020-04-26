@@ -2,7 +2,7 @@ OBJS    = hello.o example1.o example2.o ctxopt.o
 BINS    = hello example1 example2
 OUT     = hello
 CC      = c99
-CFLAGS  = -g
+CFLAGS  = -g -O
 LDFLAGS =
 
 all: hello example1 example2

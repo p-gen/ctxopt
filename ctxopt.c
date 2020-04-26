@@ -193,7 +193,7 @@ opt_inst_free(void * oi);
 static int
 seen_opt_compare(const void * so1, const void * so2);
 
-void
+static void
 incomp_bst_free(void * b);
 
 static void
@@ -208,7 +208,7 @@ opt_free(void * o);
 static int
 par_compare(const void * a1, const void * a2);
 
-void
+static void
 par_free(void * p);
 
 static void
@@ -1488,7 +1488,7 @@ seen_opt_free(void * so)
 /* =========================== */
 /* Frees an incomp_bst element */
 /* =========================== */
-void
+static void
 incomp_bst_free(void * b)
 {
   bst_t * bst = b;
@@ -1537,7 +1537,7 @@ par_compare(const void * a1, const void * a2)
 /* ======================= */
 /* Frees a par_bst element */
 /* ======================= */
-void
+static void
 par_free(void * p)
 {
   par_t * par = p;
