@@ -3873,11 +3873,13 @@ ctxopt_add_global_settings(settings s, ...)
   {
     case error_functions:
     {
+      typedef void fn(errors e, state_t * state);
+
       void (*function)(errors e, state_t * state);
 
       errors e;
       e                = va_arg(args, errors);
-      function         = va_arg(args, void (*)(errors e, state_t * state));
+      function         = va_arg(args, fn *);
       err_functions[e] = function;
       break;
     }
@@ -3982,10 +3984,12 @@ ctxopt_add_opt_settings(settings s, ...)
 
       if ((opt = locate_opt(ptr)) != NULL)
       {
+        typedef void fn(char *, char *, char *, int, char **, int, void *, int,
+                        void **);
+
         /* The third argument must be the callback function */
         /* """""""""""""""""""""""""""""""""""""""""""""""" */
-        function = va_arg(args, void (*)(char *, char *, char *, int, char **,
-                                         int, void *, int, void **));
+        function    = va_arg(args, fn *);
         opt->action = function;
 
         /* The fourth argument must be a pointer to an user's defined  */
@@ -4021,9 +4025,11 @@ ctxopt_add_opt_settings(settings s, ...)
 
       if ((opt = locate_opt(ptr)) != NULL)
       {
+        typedef int fn(int, char **, char *);
+
         /* The third argument must be a function */
         /* """"""""""""""""""""""""""""""""""""" */
-        function = va_arg(args, int (*)(int, char **, char *));
+        function = va_arg(args, fn *);
 
         cstr             = xmalloc(sizeof(constraint_t));
         cstr->constraint = function;
@@ -4107,8 +4113,9 @@ ctxopt_add_ctx_settings(settings s, ...)
       ptr = va_arg(args, char *);
       if ((ctx = locate_ctx(ptr)) != NULL)
       {
-        function    = va_arg(args,
-                          int (*)(char *, direction, char *, int, void **));
+        typedef int fn(char *, direction, char *, int, void **);
+
+        function    = va_arg(args, fn *);
         ctx->action = function;
 
         while ((data = va_arg(args, void *)) != NULL)
