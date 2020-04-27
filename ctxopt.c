@@ -3830,9 +3830,8 @@ ctxopt_range_constraint(int nb_args, char ** args, char * value, char * par)
     if (v < min)
     {
       fprintf(stderr,
-              "The argument %ld of %s is not greater than or equal to "
-              "%ld as requested.",
-              v, par, min);
+              "The argument %ld of %s is not greater than or equal to %ld.", v,
+              par, min);
       return 0;
     }
     else
@@ -3843,9 +3842,8 @@ ctxopt_range_constraint(int nb_args, char ** args, char * value, char * par)
     if (v > max)
     {
       fprintf(stderr,
-              "The argument %ld of %s is not less than or equal to "
-              "%ld as requested.",
-              v, par, max);
+              "The argument %ld of %s is not less than or equal to %ld.", v,
+              par, max);
       return 0;
     }
     else
@@ -3853,9 +3851,8 @@ ctxopt_range_constraint(int nb_args, char ** args, char * value, char * par)
   }
   else if (v < min || v > max)
   {
-    fprintf(stderr,
-            "The argument %ld of %s is not between %ld and %ld as requested.",
-            v, par, min, max);
+    fprintf(stderr, "The argument %ld of %s is not between %ld and %ld.", v,
+            par, min, max);
     return 0;
   }
 
