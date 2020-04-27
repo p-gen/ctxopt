@@ -10,9 +10,11 @@ However, cases exist where getopt shows its limits.
 **ctxopt** is able to manage complex configurations of command line
 options and excels when they appear in structured or independent blocs.
 
-**ctxopt**  uses another (better) approach to manage these simple and
-complex command lines: options are grouped in contexts, hence the ctx
-in **ctxopt**.
+In **ctxopt**, each option has the possibility of starting a new context
+in which the following command line options will be taken into account
+and analyzed.
+With this concept, it becomes easy, for example, to have repetitions
+of identical options with each their independent sub-options.
 
 Features:
 ---------
@@ -20,6 +22,8 @@ Features:
 **ctxopt** has many features, its main ones are:
 
 - Options are organized in a hierarchy of contexts.
+- Options are easily declared using a syntax similar to BNF notation in
+  each context.
 - Any number of parameters can be assigned to each option.
 - Parameters are not limited to just one character.
 - The parameters associated with an option can be abbreviated as long as
