@@ -67,15 +67,47 @@ The API consists in the following functions:
 
 * **void ctxopt_init(char *** \
   *prog_name*\
+  **, char *** \
+  *flags*\
   **);**
 
   This function initializes the internal structures uses by **ctxopt**.
   It is mandatory and must me called first.
 
-  Its only argument *prog_name* is typically the content of ``argv[0]``
+  Its first argument (*prog_name*) is typically the content of ``argv[0]``
   which nearly always contains the name of the program.
 
   *prog_name* is used by the error system.
+
+  Its second argument (*flags*) will be read as a set of parameters
+  using the syntax ``flag=value``, each flag being separated from
+  its neighbor by spaces.
+
+  Flags may be missing in this argument, in this case the missing flags
+  will be given their default value which is given below.
+  An empty string is of course allowed but must be given anyway.
+
+  For now, only two flags are understood: **stop_if_non_option** and
+  **allow_abbreviations**.
+
+  Their value can be **yes** or **no**, **1** and **0** and also accepted.
+
+  stop_if_non_option
+    Instructs **ctxopt** to stop processing arguments as soon as it
+    encounters a non-option word in the command line, even if other
+    parameters remain to be processed. The default value of this flag
+    is **0** or **no**.
+
+  allow_abbreviations
+    Tells **ctxopt** to try to guess a parameter name even if only its
+    beginning is given. The default value of this flag is **1** or
+    **yes**.
+
+  Example of content of the *flags* parameter:
+
+  .. code-block:: c
+
+    "stop_if_non_option=1 allow_abbreviations=No"
 
 |
 

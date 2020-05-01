@@ -33,7 +33,8 @@ main(int argc, char * argv[])
 
   /* initialize cop */
   /* """""""""""""" */
-  ctxopt_init(argv[0]);
+  ctxopt_init(argv[0], "stop_if_non_option=Yes "
+                       "allow_abbreviations=Yes ");
 
   /* Create a new context with its  allowed options. */
   /* """"""""""""""""""""""""""""""""""""""""""""""" */

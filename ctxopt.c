@@ -160,13 +160,23 @@ strchrcount(char * str, char c);
 static int
 strpref(char * s1, char * s2);
 
+static int
+stricmp(const char * s1, const char * s2);
+
 static char *
 xstrtok_r(char * str, const char * delim, char ** end);
+
+static int
+eval_yes(char * value, int * invalid);
+
+static char *
+get_word(char * str, char * buf, size_t len);
 
 /* ************************* */
 /* ctxopt static prototypes. */
 /* ************************* */
 
+typedef struct flags_s      flags_t;
 typedef struct opt_s        opt_t;
 typedef struct par_s        par_t;
 typedef struct ctx_s        ctx_t;
@@ -1081,6 +1091,24 @@ strpref(char * str1, char * str2)
   return *str2 == '\0';
 }
 
+/* ========================== */
+/* Like strcmp ignoring case. */
+/* ========================== */
+static int
+stricmp(const char * s1, const char * s2)
+{
+  while (tolower((unsigned char)*s1) == tolower((unsigned char)*s2))
+  {
+    if (*s1 == '\0')
+      return 0;
+
+    s1++;
+    s2++;
+  }
+
+  return (int)tolower((unsigned char)*s1) - (int)tolower((unsigned char)*s2);
+}
+
 /* ======================================================================== */
 /* Strings concatenation with dynamic memory allocation.                    */
 /* IN : a variable number of char * arguments with NULL terminating         */
@@ -1165,6 +1193,57 @@ xstrtok_r(char * str, const char * delim, char ** end)
   return ret;
 }
 
+/* ===================================================================== */
+/* Put the first word of str, truncated to len characters, in buf.       */
+/* Return a pointer in str pointing just after the word.                 */
+/* buf must have been pre-allocated to accept at least len+1 characters. */
+/* Note that buf can contains a sting full of spaces is str was not      */
+/* trimmed before the call.                                              */
+/* ===================================================================== */
+char *
+get_word(char * str, char * buf, size_t len)
+{
+  char * s = str;
+
+  /* Skip spaces. */
+  /* """""""""""" */
+  while (*s && isspace(*s))
+    s++;
+
+  /* Set the new string start. */
+  /* """"""""""""""""""""""""" */
+  str = s;
+
+  /* Get the word. */
+  /*"""""""""""""" */
+  while (*s && !isspace(*s) && s - str < len)
+    s++;
+
+  strncpy(buf, str, s - str);
+  buf[s - str] = 0;
+
+  return s;
+}
+
+/* ==================================================================== */
+/* Return 1 is value is "1" or "yes" (ignoring case).                   */
+/* Return 0 is value is "0" or "no" (ignoring case).                    */
+/* If value has another value, then set invalid to 1 and also return 0  */
+/* invalid is set to 0i in all the other cases.                         */
+/* ==================================================================== */
+static int
+eval_yes(char * value, int * invalid)
+{
+  *invalid = 0;
+
+  if (strcmp(value, "1") == 0 || stricmp(value, "yes") == 0)
+    return 1;
+  else if (strcmp(value, "0") != 0 && stricmp(value, "no") != 0)
+    *invalid = 1;
+
+  return 0;
+}
+
 /* =========================================================== */
 /* Fill an array of strings from the words composing a string. */
 /*                                                             */
@@ -1204,6 +1283,14 @@ str2argv(char * str, char ** args, int max)
 /* ********************** */
 
 static int ctxopt_initialized = 0; /* cap_init has not yet been called */
+
+/* Flags structure initialized by ctxopt_init. */
+/* """"""""""""""""""""""""""""""""""""""""""" */
+struct flags_s
+{
+  int stop_if_non_option;
+  int allow_abbreviations;
+};
 
 /* Context structure. */
 /* """""""""""""""""" */
@@ -1361,6 +1448,8 @@ static ctx_inst_t * first_ctx_inst = NULL; /* Pointer to the fist context    *
                                             | instance which holds the       *
                                             | options instances.             */
 static ll_t * ctx_inst_list = NULL;        /* List of the context instances. */
+
+static flags_t flags = { 0, 1 };
 
 /* ======================================================= */
 /* Parse a string for the next matching token.             */
@@ -2498,7 +2587,7 @@ init_opts(char * spec, ctx_t * ctx)
 /* ctxopt initialization function, must be called first. */
 /* ===================================================== */
 void
-ctxopt_init(char * prog_name)
+ctxopt_init(char * prog_name, char * init_flags)
 {
   int n;
 
@@ -2511,11 +2600,13 @@ ctxopt_init(char * prog_name)
   user_string  = xmalloc(8);
   user_string2 = xmalloc(8);
   user_object  = NULL;
+  char flag[33], fname[31], vname[31];
+  int  invalid;
 
   ctxopt_initialized = 1;
 
-  /* Update current_state.*/
-  /* """"""""""""""""""""" */
+  /* Initialize current_state.*/
+  /* """""""""""""""""""""""" */
   cur_state = xcalloc(sizeof(state_t), 0);
 
   /* Initialize custom error function pointers to NULL. */
@@ -2523,6 +2614,38 @@ ctxopt_init(char * prog_name)
   err_functions = xmalloc(CTXOPTERRSIZ * sizeof(void *));
   for (n = 0; n < CTXOPTERRSIZ; n++)
     err_functions[n] = NULL;
+
+  /* Parse init_flags if any. */
+  /* """""""""""""""""""""""" */
+  while (*init_flags && (init_flags = get_word(init_flags, flag, 32)))
+  {
+    if (*flag)
+    {
+      if (sscanf(flag, "%30[^=]=%30[^=]", fname, vname) != 2)
+        fatal_internal("Invalid flag assignment: %s", flag);
+
+      if (strcmp(fname, "stop_if_non_option") == 0)
+      {
+        if (eval_yes(vname, &invalid))
+          flags.stop_if_non_option = 1;
+        else if (!invalid)
+          flags.stop_if_non_option = 0;
+        else
+          fatal_internal("Invalid flag value for %s: %s", fname, vname);
+      }
+      else if (strcmp(fname, "allow_abbreviations") == 0)
+      {
+        if (eval_yes(vname, &invalid))
+          flags.allow_abbreviations = 1;
+        else if (!invalid)
+          flags.allow_abbreviations = 0;
+        else
+          fatal_internal("Invalid flag value for %s: %s", fname, vname);
+      }
+      else
+        fatal_internal("Invalid flag name: %s", fname);
+    }
+  }
 
   /* Update current_state. */
   /* """"""""""""""""""""" */
@@ -3126,11 +3249,12 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
         /* parameter. If this is the case then just replace it with its */
         /* full length version and try again.                           */
         /* """""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
-        if ((word = abbrev_expand(par_name, ctx)) != NULL)
-        {
-          cli_node->data = word;
-          continue;
-        }
+        if (flags.allow_abbreviations)
+          if ((word = abbrev_expand(par_name, ctx)) != NULL)
+          {
+            cli_node->data = word;
+            continue;
+          }
 
         /* Try to find a prefix which is a valid parameter in this context */
         /* If found, split the cli_node in two to build a new parameter    */
@@ -3358,25 +3482,27 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
     {
       ll_node_t * n = cli_node->next;
 
-      /* Look if potential arguments must still be analyzed until the  */
-      /* end of the context/command line part to analyze/command line. */
-      /* If this is the case we have met an extra argument.            */
-      /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
-      while (n != NULL)
-      {
-        if (strcmp(n->data, "--") == 0 || strcmp(n->data, "\x1d") == 0)
-          fatal(CTXOPTUNXARG, NULL);
+      if (!flags.stop_if_non_option)
+        /* Look if potential arguments must still be analyzed until the  */
+        /* end of the context/command line part to analyze/command line. */
+        /* If this is the case we have met an extra argument.            */
+        /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
+        while (n != NULL)
+        {
+          if (strcmp(n->data, "--") == 0 || strcmp(n->data, "\x1d") == 0)
+            fatal(CTXOPTUNXARG, NULL);
 
-        if (*(char *)(n->data) == '-')
-          fatal(CTXOPTUNXARG, NULL);
+          if (*(char *)(n->data) == '-')
+            fatal(CTXOPTUNXARG, NULL);
 
-        n = n->next;
-      }
+          n = n->next;
+        }
 
       break; /* An unexpected non parameter was seen, if no Potential *
-              | arguments remain in the command line assume that it   *
-              | is is the first of the non arguments and stop the     *
-              | command line analysis.                                */
+              | arguments remain in the command line or               *
+              | flags.stop_if_non_option is set, assume that it is is *
+              | the first of the non arguments and stop the command   *
+              | line analysis.                                        */
     }
     else if (expect_arg && *par_name != '-')
     {

@@ -40,7 +40,8 @@ main(int argc, char * argv[])
 
   /* initialize ctxopt */
   /* """"""""""""""""" */
-  ctxopt_init(argv[0]);
+  ctxopt_init(argv[0], "stop_if_non_option=Yes "
+                       "allow_abbreviations=no ");
 
   /* Create new contexts with their allowed options */
   /* """""""""""""""""""""""""""""""""""""""""""""" */
