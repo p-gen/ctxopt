@@ -141,7 +141,7 @@ Enough theory, here is a basic Hello World example:
     int     nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
     char ** rem_args    = NULL; /* Remaining arguments string array.      */
 
-    ctxopt_init(argv[0]);
+    ctxopt_init(argv[0], "stop_if_non_option=Yes allow_abbreviations=Yes");
     ctxopt_new_ctx("main", "[name... #<string>...]");
     ctxopt_add_opt_settings(parameters, "name", "-n -name");
     ctxopt_add_opt_settings(actions, "name", name_action, NULL);
