@@ -589,8 +589,6 @@ ll_new(void)
 static void
 ll_free(ll_t * const list, void (*clean)(void *))
 {
-  ll_node_t * node;
-
   if (list)
     while (list->head)
     {
@@ -3719,7 +3717,6 @@ void
 ctxopt_new_ctx(char * name, char * opts_specs)
 {
   ctx_t * ctx;
-  bst_t * node;
   char *  p;
 
   if (!ctxopt_initialized)
