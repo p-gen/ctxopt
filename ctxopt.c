@@ -394,13 +394,13 @@ fatal(errors e, char * errmsg)
       case CTXOPTCTEOPT:
         if (cur_state->ctx_par_name)
           fprintf(stderr,
-                  "%s must appear exactly %u times in the context "
+                  "%s must appear exactly %d times in the context "
                   "introduced by %s.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count,
                   cur_state->ctx_par_name);
         else
           fprintf(stderr,
-                  "%s must appear exactly %u times in "
+                  "%s must appear exactly %d times in "
                   "the main context.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count);
         break;
@@ -408,41 +408,41 @@ fatal(errors e, char * errmsg)
       case CTXOPTCTLOPT:
         if (cur_state->ctx_par_name)
           fprintf(stderr,
-                  "%s must appear less than %u times in the context "
+                  "%s must appear less than %d times in the context "
                   "introduced by %s.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count,
                   cur_state->ctx_par_name);
         else
           fprintf(stderr,
-                  "%s must appear less than %u times in the main context.\n",
+                  "%s must appear less than %d times in the main context.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count);
         break;
 
       case CTXOPTCTGOPT:
         if (cur_state->ctx_par_name)
           fprintf(stderr,
-                  "%s must appear more than %u times in the context "
+                  "%s must appear more than %d times in the context "
                   "introduced by %s.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count,
                   cur_state->ctx_par_name);
         else
           fprintf(stderr,
-                  "%s must appear more than %u times in the main context.\n",
+                  "%s must appear more than %d times in the main context.\n",
                   cur_state->cur_opt_par_name, cur_state->opts_count);
         break;
 
       case CTXOPTCTEARG:
-        fprintf(stderr, "%s must have exactly %u arguments.\n",
+        fprintf(stderr, "%s must have exactly %d arguments.\n",
                 cur_state->cur_opt_par_name, cur_state->opt_args_count);
         break;
 
       case CTXOPTCTLARG:
-        fprintf(stderr, "%s must have less than %u arguments.\n",
+        fprintf(stderr, "%s must have less than %d arguments.\n",
                 cur_state->cur_opt_par_name, cur_state->opt_args_count);
         break;
 
       case CTXOPTCTGARG:
-        fprintf(stderr, "%s must have more than %u arguments.\n",
+        fprintf(stderr, "%s must have more than %d arguments.\n",
                 cur_state->cur_opt_par_name, cur_state->opt_args_count);
         break;
 
