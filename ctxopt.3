@@ -80,15 +80,53 @@ but can help readability.
 The API consists in the following functions:
 .INDENT 0.0
 .IP \(bu 2
-\fBvoid ctxopt_init(char *\fP \fIprog_name\fP\fB);\fP
+\fBvoid ctxopt_init(char *\fP \fIprog_name\fP\fB, char *\fP \fIflags\fP\fB);\fP
 .sp
 This function initializes the internal structures uses by \fBctxopt\fP\&.
 It is mandatory and must me called first.
 .sp
-Its only argument \fIprog_name\fP is typically the content of \fBargv[0]\fP
+Its first argument (\fIprog_name\fP) is typically the content of \fBargv[0]\fP
 which nearly always contains the name of the program.
 .sp
 \fIprog_name\fP is used by the error system.
+.sp
+Its second argument (\fIflags\fP) will be read as a set of parameters
+using the syntax \fBflag=value\fP, each flag being separated from
+its neighbor by spaces.
+.sp
+Flags may be missing in this argument, in this case the missing flags
+will be given their default value which is given below.
+An empty string is of course allowed but must be given anyway.
+.sp
+For now, only two flags are understood: \fBstop_if_non_option\fP and
+\fBallow_abbreviations\fP\&.
+.sp
+Their value can be \fByes\fP or \fBno\fP, \fB1\fP and \fB0\fP and also accepted.
+.INDENT 2.0
+.TP
+.B stop_if_non_option
+Instructs \fBctxopt\fP to stop processing arguments as soon as it
+encounters a non\-option word in the command line, even if other
+parameters remain to be processed. The default value of this flag
+is \fB0\fP or \fBno\fP\&.
+.TP
+.B allow_abbreviations
+Tells \fBctxopt\fP to try to guess a parameter name even if only its
+beginning is given. The default value of this flag is \fB1\fP or
+\fByes\fP\&.
+.UNINDENT
+.sp
+Example of content of the \fIflags\fP parameter:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+"stop_if_non_option=1 allow_abbreviations=No"
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .nf
 
