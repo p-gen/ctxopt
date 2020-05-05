@@ -3370,20 +3370,22 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
           ll_append(ctx_inst->opt_inst_list, opt_inst);
         else
         {
-          ll_node_t *  node = ctx_inst->opt_inst_list->head;
+          ll_node_t *  opt_inst_node = ctx_inst->opt_inst_list->head;
           opt_inst_t * tmp_opt_inst;
-          while (node != NULL)
+
+          while (opt_inst_node != NULL)
           {
-            tmp_opt_inst = node->data;
+            tmp_opt_inst = opt_inst_node->data;
             if (!tmp_opt_inst->opt->eval_first)
             {
-              ll_insert_before(ctx_inst->opt_inst_list, node, opt_inst);
+              ll_insert_before(ctx_inst->opt_inst_list, opt_inst_node,
+                               opt_inst);
               break;
             }
             else
-              node = node->next;
+              opt_inst_node = opt_inst_node->next;
           }
-          if (node == NULL)
+          if (opt_inst_node == NULL)
             ll_append(ctx_inst->opt_inst_list, opt_inst);
         }
 
