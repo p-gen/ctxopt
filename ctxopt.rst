@@ -8,7 +8,7 @@ An advanced command line options manager.
 
 :Author: Pierre Gentile p.gen.progs@gmail.com
 :Date: 2020
-:Copyright: GPLv2
+:Copyright: MPLv2.0
 :Manual section: 3
 
 DESCRIPTION
