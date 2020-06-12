@@ -77,9 +77,11 @@ typedef enum
   leaf
 } walk_order_e;
 
+#if 0 /* Unused yet */
 static void *
 bst_delete(const void * vkey, void ** vrootp,
            int (*compar)(const void *, const void *));
+#endif
 
 static void
 bst_destroy(void * vrootp, void (*clean)(void *));
