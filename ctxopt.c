@@ -3203,6 +3203,11 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
     par_name = cli_node->data;
 
+    /* Replace a leading -- by a single - */
+    /* """""""""""""""""""""""""""""""""" */
+    if (strncmp(cli_node->data, "--", 2) == 0)
+      par_name += 1; /* Ignore the first dash */
+
     if (strcmp(par_name, "\x1d") == 0)
     {
       check_for_missing_mandatory_opt(ctx_inst, (char *)(cli_node->prev->data));

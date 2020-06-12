@@ -28,6 +28,11 @@ This offers the possibility of having a hierarchy of option groups.
 
 Each option has a set of parameters which must start with a single dash
 and may appear in the command line.
+
+In order not to change habits, the double dash notation popularized by
+the GNU **getopt_long** function for long options is also accepted and
+automatically and silently converted to notation with a single dash.
+
 These parameters are not limited to a dash followed by single letter.
 In what follows, I will consider for simplicity that these are the options
 which are visible in the command line and not one of their parameters.
