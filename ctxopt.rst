@@ -758,3 +758,7 @@ The API consists in the following functions:
   This function walks through the tree of context instances previously
   built by **ctxopt_analyze** and launches the action attached to
   each options, if any, one after the other.
+
+* **ctxopt_free_memory(void)**
+
+  This function frees the memory used internally by **ctxopt**.

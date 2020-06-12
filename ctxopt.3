@@ -880,6 +880,10 @@ ctxopt_analyze(argc\-1, argv+1, &res_argc, &res_argv);
 This function walks through the tree of context instances previously
 built by \fBctxopt_analyze\fP and launches the action attached to
 each options, if any, one after the other.
+.IP \(bu 2
+\fBctxopt_free_memory(void)\fP
+.sp
+This function frees the memory used internally by \fBctxopt\fP\&.
 .UNINDENT
 .SH AUTHOR
 Pierre Gentile p.gen.progs@gmail.com
