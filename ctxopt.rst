@@ -178,10 +178,16 @@ The API consists in the following functions:
       One optional option named **opt** taking multiple optional
       arguments.
 
-  opt...<3 #...=3
-      The mandatory option **opt** is restricted to only appear one or
-      two times in the context.
-      The number of its mandatory arguments must be exactly three.
+  The number of options/arguments allowed can be restricted by adding
+  an operator and an integer just after the dots like in the following
+  example:
+
+    opt...<3 #...=3
+        Here, the mandatory option **opt** is restricted to only appear
+        one or two times in the context.
+        The number of its mandatory arguments must be exactly three.
+
+        Valid operators are **<**, **=** and **>**.
 
   The multiplicity or not of the options and argument, their mandatory or
   optional characteristics constitutes their signatures.s

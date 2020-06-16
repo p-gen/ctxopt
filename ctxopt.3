@@ -197,11 +197,23 @@ It takes an optional argument with a tag named \fB<value>\fP\&.
 .B [opt... [#...]]
 One optional option named \fBopt\fP taking multiple optional
 arguments.
+.UNINDENT
+.sp
+The number of options/arguments allowed can be restricted by adding
+an operator and an integer just after the dots like in the following
+example:
+.INDENT 2.0
+.INDENT 3.5
+.INDENT 0.0
 .TP
 .B opt...<3 #...=3
-The mandatory option \fBopt\fP is restricted to only appear one or
-two times in the context.
+Here, the mandatory option \fBopt\fP is restricted to only appear
+one or two times in the context.
 The number of its mandatory arguments must be exactly three.
+.sp
+Valid operators are \fB<\fP, \fB=\fP and \fB>\fP\&.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .sp
 The multiplicity or not of the options and argument, their mandatory or
