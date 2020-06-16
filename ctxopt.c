@@ -2152,17 +2152,17 @@ check_for_occurrences_issues(ctx_inst_t * ctx_inst)
       {
         case '=':
           if (opt->occurrences > 0 && opt->opt_count_mark != opt->occurrences)
-            fatal(CTXOPTCTEOPT, "");
+            fatal(CTXOPTCTEOPT, NULL);
           break;
 
         case '<':
           if (opt->occurrences > 0 && opt->opt_count_mark <= opt->occurrences)
-            fatal(CTXOPTCTLOPT, "");
+            fatal(CTXOPTCTLOPT, NULL);
           break;
 
         case '>':
           if (opt->occurrences > 0 && opt->opt_count_mark >= opt->occurrences)
-            fatal(CTXOPTCTGOPT, "");
+            fatal(CTXOPTCTGOPT, NULL);
           break;
       }
 
@@ -2189,17 +2189,17 @@ check_for_occurrences_issues(ctx_inst_t * ctx_inst)
       {
         case '=':
           if (nb_values > 0 && opt->opt_args_count_mark != nb_values)
-            fatal(CTXOPTCTEARG, "");
+            fatal(CTXOPTCTEARG, NULL);
           break;
 
         case '<':
           if (nb_values > 0 && opt->opt_args_count_mark <= nb_values)
-            fatal(CTXOPTCTLARG, "");
+            fatal(CTXOPTCTLARG, NULL);
           break;
 
         case '>':
           if (nb_values > 0 && opt->opt_args_count_mark >= nb_values)
-            fatal(CTXOPTCTGARG, "");
+            fatal(CTXOPTCTGARG, NULL);
           break;
       }
 
