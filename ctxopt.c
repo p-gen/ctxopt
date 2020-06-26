@@ -3639,7 +3639,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 void
 ctxopt_free_memory(void)
 {
-  ll_destroy(cmdline_list, NULL);
+  ll_destroy(cmdline_list, free);
   ll_destroy(ctx_inst_list, ctx_inst_free);
   bst_destroy(options_bst, opt_free);
   bst_destroy(contexts_bst, ctx_free);
