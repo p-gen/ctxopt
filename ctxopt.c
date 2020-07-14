@@ -2353,6 +2353,21 @@ opt_parse(char * s, opt_t ** opt)
     }
   }
 
+  if (*s == ']')
+  {
+    /* Abort on extraneous ] if the option is mandatory. */
+    /* """"""""""""""""""""""""""""""""""""""""""""""""" */
+    if (!opt_optional)
+      return -(s - s_orig - 1);
+
+    s++; /* skip the ] */
+
+    if (!*s || isblank(*s))
+      goto success;
+    else
+      return -(s - s_orig - 1);
+  }
+
   /* A blank separates the option name and the argument tag. */
   /* """"""""""""""""""""""""""""""""""""""""""""""""""""""" */
   if (isblank(*s))
