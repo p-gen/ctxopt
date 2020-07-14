@@ -36,11 +36,13 @@ Features:
 - Arguments can be multiple and their number controlled by simple rules.
 - Arguments can have user-defined or built-in constraints.
 - Options marked as mutually incompatibles are automatically detected.
+- Command line options are normally evaluated in order but can be forced
+  to be evaluated at the start of a context. They can also be asked to
+  be reordered automatically to be evaluated before or after a set of
+  other options in a context.
 - Error functions can be customized.
 - Automatic detection of missing|incompatible|unknown|... options or
   parameters.
-- Command lines options are evaluated in order but some options can be
-  forced to be evaluated first though.
 
 Context notion illustrated by a tiny example:
 ---------------------------------------------
