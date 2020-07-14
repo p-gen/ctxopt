@@ -792,6 +792,54 @@ the extended regular expression:
 .UNINDENT
 .sp
 See below for details about the function \fBctxopt_re_constraint\fP\&.
+.TP
+.B before or after
+These settings allow to tell ctxopt than some options must be
+evaluated \fBbefore\fP or \fBafter\fP a given option in a context.
+This can be useful, for example, if an action triggered by the
+evaluation of a option is required to be executed before the action
+of another option.
+.sp
+Example of \fBbefore\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_add_opt_settings(before,
+                        "opt1",
+                        "opt2 opt3");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In this example, \fBopt2\fP and \fBopt3\fP will be evaluated \fIbefore\fP
+\fBopt1\fP\&.
+The relative order of \fBopt2\fP and \fBopt3\fP evaluations will still
+follow their order of appearance in the command line.
+.sp
+Example of \fBafter\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ctxopt_add_opt_settings(after,
+                        "opt2",
+                        "opt3 opt4");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+In this example, \fBopt3\fP and \fBopt4\fP will be evaluated \fIafter\fP
+\fBopt2\fP\&.
+This example shows than we can combine multiple settings reusing
+options previously mentioned.
+.sp
+Incompatible setting combinations are not checked and will be ignored
+or lead to undefined behaviors.
 .UNINDENT
 .UNINDENT
 .nf

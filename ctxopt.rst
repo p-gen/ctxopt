@@ -660,6 +660,42 @@ The API consists in the following functions:
 
     See below for details about the function **ctxopt_re_constraint**.
 
+  before or after
+    These settings allow to tell ctxopt than some options must be
+    evaluated **before** or **after** a given option in a context.
+    This can be useful, for example, if an action triggered by the
+    evaluation of a option is required to be executed before the action
+    of another option.
+
+    Example of **before** setting:
+
+    .. code-block:: c
+
+      ctxopt_add_opt_settings(before,
+                              "opt1",
+                              "opt2 opt3");
+
+    In this example, **opt2** and **opt3** will be evaluated *before*
+    **opt1**.
+    The relative order of **opt2** and **opt3** evaluations will still
+    follow their order of appearance in the command line.
+
+    Example of **after** setting:
+
+    .. code-block:: c
+
+      ctxopt_add_opt_settings(after,
+                              "opt2",
+                              "opt3 opt4");
+
+    In this example, **opt3** and **opt4** will be evaluated *after*
+    **opt2**.
+    This example shows than we can combine multiple settings reusing
+    options previously mentioned.
+
+    Incompatible setting combinations are not checked and will be ignored
+    or lead to undefined behaviors.
+
 |
 
 * **int ctxopt_format_constraint(int** \
