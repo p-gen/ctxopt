@@ -804,3 +804,14 @@ The API consists in the following functions:
 * **ctxopt_free_memory(void)**
 
   This function frees the memory used internally by **ctxopt**.
+
+ENVIRONMENT
+===========
+
+**ctxopt** is able to switch to debug mode if the variable CTXOPT_DEBUG
+is set to any not-empty value.
+
+If this is the case, informational messages about how **ctxopt**
+analyses the command line are printed on the error output.
+
+Each of them are prefixed with "CTXOPT_DEBUG: ".

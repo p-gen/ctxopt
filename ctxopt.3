@@ -945,6 +945,15 @@ each options, if any, one after the other.
 .sp
 This function frees the memory used internally by \fBctxopt\fP\&.
 .UNINDENT
+.SH ENVIRONMENT
+.sp
+\fBctxopt\fP is able to switch to debug mode if the variable CTXOPT_DEBUG
+is set to any not\-empty value.
+.sp
+If this is the case, informational messages about how \fBctxopt\fP
+analyses the command line are printed on the error output.
+.sp
+Each of them are prefixed with "CTXOPT_DEBUG: ".
 .SH AUTHOR
 Pierre Gentile p.gen.progs@gmail.com
 .SH COPYRIGHT
