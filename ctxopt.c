@@ -237,6 +237,9 @@ static par_t *
 locate_par(char * name, ctx_t * ctx);
 
 static void
+print_before_constraints(ll_t * list);
+
+static void
 print_options(ll_t * list, int * has_optional, int * has_ellipsis,
               int * has_rule, int * has_generic_arg, int * has_ctx_change,
               int * has_early_eval);
@@ -1717,6 +1720,51 @@ locate_par(char * name, ctx_t * ctx)
     return node->key;
 }
 
+/* ====================================================================== */
+/* Helper function to display the dependency constraints between options. */
+/* These constraints are set with the ctxopt_add_opt_settings function    */
+/* using the 'before' and 'after' arguments.                              */
+/* IN  list  : a list of options.                                         */
+/* ====================================================================== */
+static void
+print_before_constraints(ll_t * list)
+{
+  ll_node_t * node = list->head;
+  ll_node_t * before_node;
+  opt_t *     opt, *before_opt;
+  int         msg = 0;
+
+  while (node != NULL)
+  {
+    opt = node->data;
+
+    if (opt->eval_before_list->len > 0)
+    {
+      if (!msg)
+      {
+        printf("\n  If present in the command line,");
+        msg = 1; /* Display this message only once. */
+      }
+
+      before_node = opt->eval_before_list->head;
+
+      printf("\n  ");
+      while (before_node != NULL)
+      {
+        before_opt = before_node->data;
+        printf("%s", before_opt->params);
+
+        before_node = before_node->next;
+
+        if (before_node != NULL)
+          printf(" and\n  ");
+      }
+      printf(" will be evaluated after %s\n", opt->params);
+    }
+    node = node->next;
+  }
+}
+
 /* =================================================================== */
 /* Utility function to format and print the options present in a list. */
 /*                                                                     */
@@ -1931,6 +1979,7 @@ bst_print_ctx_cb(const void * node, walk_order_e kind, int level)
       printf("\nAllowed options in the context %s:\n", cur_ctx->name);
       print_options(list, &has_optional, &has_ellipsis, &has_rule,
                     &has_generic_arg, &has_ctx_change, &has_early_eval);
+      print_before_constraints(list);
     }
 }
 
@@ -3949,6 +3998,8 @@ ctxopt_ctx_disp_usage(char * ctx_name, usage_behaviour action)
   print_options(list, &has_optional, &has_ellipsis, &has_rule, &has_generic_arg,
                 &has_ctx_change, &has_early_eval);
 
+  print_before_constraints(list);
+
   print_explanations(has_early_eval, has_ctx_change, has_generic_arg,
                      has_optional, has_ellipsis, has_rule);
 
@@ -3981,6 +4032,10 @@ ctxopt_disp_usage(usage_behaviour action)
   list = main_ctx->opt_list;
   print_options(list, &has_optional, &has_ellipsis, &has_rule, &has_generic_arg,
                 &has_ctx_change, &has_early_eval);
+
+  /* Dependency constraints between options. */
+  /* """"""""""""""""""""""""""""""""""""""" */
+  print_before_constraints(list);
 
   /* Usage for the other contexts. */
   /* """"""""""""""""""""""""""""" */
