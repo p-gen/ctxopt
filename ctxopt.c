@@ -1855,17 +1855,16 @@ print_explanations(int has_early_eval, int has_ctx_change, int has_generic_arg,
            "displayed.\n\n");
 
     if (has_early_eval)
-      printf("*            : the parameters for this option will be "
-             "evaluated first.\n");
+      printf("*            : the parameters defined for this option will "
+             "be evaluated first.\n");
     if (has_ctx_change)
-      printf(
-        ">            : The context after this symbol will become the next "
-        "default one.\n");
+      printf(">            : the context after this symbol will be the new "
+             "default context.\n");
     if (has_generic_arg)
-      printf("#tag         : argument tag giving a clue to its meaning.\n");
+      printf("#tag         : argument with a hint about its meaning.\n");
     if (has_optional)
-      printf(
-        "[...]        : the object between square brackets is optional.\n");
+      printf("[...]        : the object between square brackets is "
+             "optional.\n");
     if (has_ellipsis)
       printf("...          : several occurrences of the previous object "
              "are possible.\n");
