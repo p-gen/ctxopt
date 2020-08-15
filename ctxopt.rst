@@ -388,12 +388,37 @@ The API consists in the following functions:
     .. code-block:: c
 
       void ctxopt_add_ctx_settings(incompatibilities,
-                                   context1,
+                                   "context1",
                                    "opt1 opt2 opt3");
 
     The three options named **opt1**, **opt2** and **opt3** will be
     marked as mutually incompatibles in each instance of the context
     **context1**.
+
+  requirements:
+    This setting allows options in a context to require the presence of
+    sets of other options of which at least one must be present.
+    Using this setting, the user can impose dependencies between options.
+
+    The option that imposes the requirement must be the first in the
+    list of options listed in the third arguments.
+
+    Example of **requirements** setting:
+
+    .. code-block:: c
+
+      void ctxopt_add_ctx_settings(requirements;
+                                   "context1",
+                                   "opt1 opt2 opt3");
+
+    At least one of the two options named **opt2** and **opt3** must
+    be present in the same context instance as **opt1** which is
+    **context1** in this case
+
+    There may be multiple requirements via multiple calls to
+    **ctxopt_add_ctx_settings** for the same first option (**opt1**
+    in the previous example) and the same context.
+    Each of them is considered in order.
 
   actions:
     This setting allows to associate a function to the context.

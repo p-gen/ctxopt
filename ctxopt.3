@@ -458,7 +458,7 @@ Example of \fBincompatibilities\fP setting:
 .nf
 .ft C
 void ctxopt_add_ctx_settings(incompatibilities,
-                             context1,
+                             "context1",
                              "opt1 opt2 opt3");
 .ft P
 .fi
@@ -468,6 +468,37 @@ void ctxopt_add_ctx_settings(incompatibilities,
 The three options named \fBopt1\fP, \fBopt2\fP and \fBopt3\fP will be
 marked as mutually incompatibles in each instance of the context
 \fBcontext1\fP\&.
+.TP
+.B requirements:
+This setting allows options in a context to require the presence of
+sets of other options of which at least one must be present.
+Using this setting, the user can impose dependencies between options.
+.sp
+The option that imposes the requirement must be the first in the
+list of options listed in the third arguments.
+.sp
+Example of \fBrequirements\fP setting:
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+void ctxopt_add_ctx_settings(requirements;
+                             "context1",
+                             "opt1 opt2 opt3");
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+At least one of the two options named \fBopt2\fP and \fBopt3\fP must
+be present in the same context instance as \fBopt1\fP which is
+\fBcontext1\fP in this case
+.sp
+There may be multiple requirements via multiple calls to
+\fBctxopt_add_ctx_settings\fP for the same first option (\fBopt1\fP
+in the previous example) and the same context.
+Each of them is considered in order.
 .TP
 .B actions:
 This setting allows to associate a function to the context.
