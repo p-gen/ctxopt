@@ -2372,7 +2372,6 @@ check_for_requirement_issues(ctx_inst_t * ctx_inst)
       if (!found)
       {
         char * errmsg;
-        size_t size;
 
         if (req->or_opt_list->len > 1)
           errmsg = xstrdup("At least one of the parameters among:\n  %s\n"
@@ -4543,7 +4542,6 @@ ctxopt_add_opt_settings(settings s, ...)
     case after:
     {
       char * str;
-      ll_t * list;
 
       /* The second argument must be a string. */
       /* """"""""""""""""""""""""""""""""""""" */
@@ -4599,7 +4597,6 @@ ctxopt_add_opt_settings(settings s, ...)
     case before:
     {
       char * str;
-      ll_t * list;
 
       /* The second argument must be a string. */
       /* """"""""""""""""""""""""""""""""""""" */
