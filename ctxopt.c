@@ -2216,7 +2216,7 @@ has_unseen_mandatory_opt(ctx_inst_t * ctx_inst, char ** missing)
 /* given in ctxopt_new_ctx.                                                  */
 /* ========================================================================= */
 static void
-check_for_occurrences_issues(ctx_inst_t * ctx_inst)
+check_for_occurrence_issues(ctx_inst_t * ctx_inst)
 {
   ctx_t *      ctx = ctx_inst->ctx;
   opt_t *      opt;
@@ -3460,7 +3460,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
     if (strcmp(par_name, "\x1d") == 0)
     {
       check_for_missing_mandatory_opt(ctx_inst, (char *)(cli_node->prev->data));
-      check_for_occurrences_issues(ctx_inst);
+      check_for_occurrence_issues(ctx_inst);
       check_for_requirement_issues(ctx_inst);
 
       /* Forced backtracking to the previous context instance. */
@@ -3573,7 +3573,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
         else
         {
           check_for_missing_mandatory_opt(ctx_inst, par_name);
-          check_for_occurrences_issues(ctx_inst);
+          check_for_occurrence_issues(ctx_inst);
           check_for_requirement_issues(ctx_inst);
 
           if (ctx_inst->prev_ctx_inst == NULL)
@@ -3926,7 +3926,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
     cur_state->ctx_par_name = ctx_inst->par_name;
 
     check_for_missing_mandatory_opt(ctx_inst, par_name);
-    check_for_occurrences_issues(ctx_inst);
+    check_for_occurrence_issues(ctx_inst);
     check_for_requirement_issues(ctx_inst);
 
     node = node->next;
