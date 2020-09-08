@@ -3444,8 +3444,11 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
   /* """""""""""""""""""""""""""""""""" */
   cli_node   = cmdline_list->head;
   expect_par = 1;
+  par_name   = NULL;
+
   while (cli_node != NULL)
   {
+
     if (strcmp(cli_node->data, "--") == 0)
       break; /* No new parameter will be analyzed after this point. */
 
@@ -3453,7 +3456,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
     /* Replace a leading -- by a single - */
     /* """""""""""""""""""""""""""""""""" */
-    if (strncmp(cli_node->data, "--", 2) == 0)
+    if (strncmp(par_name, "--", 2) == 0)
       par_name += 1; /* Ignore the first dash */
 
     if (strcmp(par_name, "\x1d") == 0)
@@ -3906,7 +3909,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
     cli_node = cli_node->next;
   }
 
-  if (cmdline_list->len > 0 && *par_name == '-')
+  if (cmdline_list->len > 0 && par_name && *par_name == '-')
   {
     if (expect_arg && !opt->optional_args)
       fatal(CTXOPTMISARG, NULL);
