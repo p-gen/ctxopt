@@ -211,6 +211,9 @@ static void
 incomp_bst_free(void * b);
 
 static void
+req_free(void * r);
+
+static void
 seen_opt_free(void * seen_opt);
 
 static int
@@ -1559,6 +1562,7 @@ ctx_free(void * c)
 
   ll_destroy(ctx->opt_list, NULL);
   ll_destroy(ctx->incomp_list, free);
+  ll_destroy(ctx->req_list, free);
   bst_destroy(ctx->par_bst, par_free);
 
   free(c);
@@ -1576,13 +1580,14 @@ ctx_inst_free(void * ci)
   ll_destroy(ctx_inst->incomp_bst_list, incomp_bst_free);
   bst_destroy(ctx_inst->seen_opt_bst, seen_opt_free);
   ll_destroy(ctx_inst->opt_inst_list, opt_inst_free);
+  ll_destroy(ctx_inst->opt_req_list, req_free);
 
   free(ci);
 }
 
-/* ============================= */
-/* Free a opt_inst_list element. */
-/* ============================= */
+/* ============================== */
+/* Free an opt_inst_list element. */
+/* ============================== */
 static void
 opt_inst_free(void * oi)
 {
@@ -1631,6 +1636,18 @@ incomp_bst_free(void * b)
   bst_destroy(bst, NULL);
 }
 
+/* ============================= */
+/* Free an opt_req_list element. */
+/* ============================= */
+static void
+req_free(void * r)
+{
+  req_t * req = r;
+
+  ll_destroy(req->or_opt_list, NULL);
+  free(req);
+}
+
 /* ================================= */
 /* Compare two options_bst elements. */
 /* ================================= */
@@ -1656,6 +1673,7 @@ opt_free(void * o)
 
   ll_destroy(opt->ctx_list, NULL);
   ll_destroy(opt->constraints_list, constraint_free);
+  ll_destroy(opt->eval_before_list, NULL);
 
   free(o);
 }
@@ -3125,6 +3143,8 @@ new_ctx_inst(ctx_t * ctx, ctx_inst_t * prev_ctx_inst)
     }
     else
       fatal_internal("Unknown option %s.", opt_name);
+
+    free(str);
 
     node = node->next;
   }
