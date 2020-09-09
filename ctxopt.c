@@ -1417,17 +1417,17 @@ struct opt_s
 /* """"""""""""""""""""""""""" */
 struct ctx_inst_s
 {
-  ctx_t *      ctx;           /* the context whose this is an instance of  */
-  ctx_inst_t * prev_ctx_inst; /* ctx_inst of the opt_inst which led to the *
-                               | creation of this ctx_inst structure.      */
-  opt_inst_t * gen_opt_inst;  /* opt_inst which led to the creation of a   *
-                               | instance of this structure.               */
-  ll_t * incomp_bst_list;     /* list of seen_opt_t BST.                   */
-  void * seen_opt_bst;        /* tree of seen_opt_t.                       */
-  ll_t * opt_req_list;        /* list of req_t.                            */
-  ll_t * opt_inst_list;       /* The list of option instances in this      *
-                               | context instance.                         */
-  char * par_name;            /* parameter which created this instance.    */
+  ctx_t *      ctx;             /* the context whose this is an instance of  */
+  ctx_inst_t * prev_ctx_inst;   /* ctx_inst of the opt_inst which led to the *
+                                 | creation of this ctx_inst structure.      */
+  opt_inst_t * gen_opt_inst;    /* opt_inst which led to the creation of a   *
+                                 | instance of this structure.               */
+  ll_t *       incomp_bst_list; /* list of seen_opt_t BST.                   */
+  void *       seen_opt_bst;    /* tree of seen_opt_t.                       */
+  ll_t *       opt_req_list;    /* list of req_t.                            */
+  ll_t *       opt_inst_list;   /* The list of option instances in this      *
+                                 | context instance.                         */
+  char *       par_name;        /* parameter which created this instance.    */
 };
 
 /* Option instance structure. */
@@ -1483,15 +1483,15 @@ struct constraint_s
                     | it to be freed.                                      */
 };
 
-state_t *     cur_state = NULL;            /* Current analysis state.        */
-static ll_t * cmdline_list;                /* List of interpreted CLI words  *
+state_t *           cur_state = NULL;      /* Current analysis state.        */
+static ll_t *       cmdline_list;          /* List of interpreted CLI words  *
                                             | serves as the basis for the    *
                                             | analysis of the parameters.    */
 static ctx_t *      main_ctx       = NULL; /* initial context.               */
 static ctx_inst_t * first_ctx_inst = NULL; /* Pointer to the fist context    *
                                             | instance which holds the       *
                                             | options instances.             */
-static ll_t * ctx_inst_list = NULL;        /* List of the context instances. */
+static ll_t *       ctx_inst_list  = NULL; /* List of the context instances. */
 
 static flags_t flags = { 0, 1 };
 
@@ -3448,7 +3448,6 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
   while (cli_node != NULL)
   {
-
     if (strcmp(cli_node->data, "--") == 0)
       break; /* No new parameter will be analyzed after this point. */
 
