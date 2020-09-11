@@ -2455,7 +2455,7 @@ opt_parse(char * s, opt_t ** opt)
   char * s_orig = s;
 
   char * p;
-  char * opt_name;
+  char * opt_name = NULL;
   char * next_ctx;
   char   token[65];
 
@@ -2551,14 +2551,20 @@ opt_parse(char * s, opt_t ** opt)
     /* Abort on extraneous ] if the option is mandatory. */
     /* """"""""""""""""""""""""""""""""""""""""""""""""" */
     if (!opt_optional)
+    {
+      free(opt_name);
       return -(s - s_orig - 1);
+    }
 
     s++; /* skip the ] */
 
     if (!*s || isblank(*s))
       goto success;
     else
+    {
+      free(opt_name);
       return -(s - s_orig - 1);
+    }
   }
 
   /* A blank separates the option name and the argument tag. */
@@ -2641,7 +2647,10 @@ opt_parse(char * s, opt_t ** opt)
       /* Abort on extraneous ] if the option is mandatory. */
       /* """"""""""""""""""""""""""""""""""""""""""""""""" */
       if (!opt_optional)
+      {
+        free(opt_name);
         return -(s - s_orig - 1);
+      }
 
       s++; /* skip the ] */
 
@@ -2665,7 +2674,10 @@ opt_parse(char * s, opt_t ** opt)
                              * of another option.                      */
       goto success;
     else
+    {
+      free(opt_name);
       return -(s - s_orig - 1);
+    }
   }
 
 success:
