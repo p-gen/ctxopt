@@ -3934,7 +3934,7 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
   if (cmdline_list->len > 0 && par_name && *par_name == '-')
   {
-    if (expect_arg && !opt->optional_args)
+    if (expect_arg && opt && !opt->optional_args)
       fatal(CTXOPTMISARG, NULL);
   }
 
