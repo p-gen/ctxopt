@@ -1486,8 +1486,8 @@ struct constraint_s
                     | it to be freed.                                      */
 };
 
-state_t *           cur_state = NULL;      /* Current analysis state.        */
-static ll_t *       cmdline_list;          /* List of interpreted CLI words  *
+state_t *           cur_state      = NULL; /* Current analysis state.        */
+static ll_t *       cmdline_list   = NULL; /* List of interpreted CLI words  *
                                             | serves as the basis for the    *
                                             | analysis of the parameters.    */
 static ctx_t *      main_ctx       = NULL; /* initial context.               */
@@ -3208,17 +3208,9 @@ ctxopt_build_cmdline_list(int nb_words, char ** words)
   /* If the option list is not empty, clear it before going further. */
   /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
   if (cmdline_list != NULL)
-  {
-    node = cmdline_list->head;
-    while (node != NULL)
-    {
-      free(node->data);
-      ll_delete(cmdline_list, node);
-      node = cmdline_list->head;
-    }
-  }
-  else
-    cmdline_list = ll_new();
+    ll_destroy(cmdline_list, free);
+
+  cmdline_list = ll_new();
 
   start_node = cmdline_list->head; /* In the following loop start_node will *
                                     * contain a pointer to the current      *
