@@ -1318,7 +1318,10 @@ struct flags_s
 {
   int stop_if_non_option;
   int allow_abbreviations;
+  int display_usage_on_error;
 };
+
+static flags_t flags = { 0, 1, 1 };
 
 /* Context structure. */
 /* """""""""""""""""" */
@@ -1495,8 +1498,6 @@ static ctx_inst_t * first_ctx_inst = NULL; /* Pointer to the fist context    *
                                             | instance which holds the       *
                                             | options instances.             */
 static ll_t *       ctx_inst_list  = NULL; /* List of the context instances. */
-
-static flags_t flags = { 0, 1 };
 
 /* ======================================================= */
 /* Parse a string for the next matching token.             */
@@ -2876,6 +2877,15 @@ ctxopt_init(char * prog_name, char * init_flags)
         else
           fatal_internal("Invalid flag value for %s: %s.", fname, vname);
       }
+      else if (strcmp(fname, "display_usage_on_error") == 0)
+      {
+        if (eval_yes(vname, &invalid))
+          flags.display_usage_on_error = 1;
+        else if (!invalid)
+          flags.display_usage_on_error = 0;
+        else
+          fatal_internal("Invalid flag value for %s: %s.", fname, vname);
+      }
       else
         fatal_internal("Invalid flag name: %s.", fname);
     }
@@ -3618,14 +3628,21 @@ ctxopt_analyze(int nb_words, char ** words, int * nb_rem_args,
 
             if (*user_string2 != '\0')
             {
+              char * help_msg;
+
+              if (flags.display_usage_on_error)
+                help_msg = "see below.\n";
+              else
+                help_msg = "\nrefer to the manual for more information.\n";
+
               errmsg = strappend(
                 errmsg,
                 "\nThis parameter is only valid in one of the following "
                 "contexts:\n",
                 user_string2,
                 "\n\nSwitch to one of them first using the appropriate "
-                "parameter, see below.\n",
-                (char *)0);
+                "parameter, ",
+                help_msg, (char *)0);
             }
 
             fatal(CTXOPTUNKPAR, errmsg);
@@ -4159,6 +4176,9 @@ ctxopt_ctx_disp_usage(char * ctx_name, usage_behaviour action)
   int has_ctx_change  = 0;
   int has_early_eval  = 0;
 
+  if (!flags.display_usage_on_error)
+    return;
+
   ctx = locate_ctx(ctx_name);
   if (ctx == NULL)
     fatal_internal("Unknown context %s.", ctx_name);
@@ -4197,6 +4217,9 @@ ctxopt_disp_usage(usage_behaviour action)
   int    has_generic_arg = 0;
   int    has_ctx_change  = 0;
   int    has_early_eval  = 0;
+
+  if (!flags.display_usage_on_error)
+    return;
 
   if (main_ctx == NULL)
     fatal_internal("At least one context must have been created.");

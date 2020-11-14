@@ -92,8 +92,8 @@ The API consists in the following functions:
   will be given their default value which is given below.
   An empty string is of course allowed but must be given anyway.
 
-  For now, only two flags are understood: **stop_if_non_option** and
-  **allow_abbreviations**.
+  For now, only three flags are understood: **stop_if_non_option**,
+  **allow_abbreviations** and **display_usage_on_error**.
 
   Their value can be **yes** or **no**, **1** and **0** and also accepted.
 
@@ -107,6 +107,12 @@ The API consists in the following functions:
     Tells **ctxopt** to try to guess a parameter name even if only its
     beginning is given. The default value of this flag is **1** or
     **yes**.
+
+  display_usage_on_error
+    If the setting is set to yes (default), the usage text for the
+    relevant contexts is displayed in case of a fatal error.
+    This may be useful to reduce the length of the error message and
+    allow the user to see the error more easily.
 
   Example of content of the *flags* parameter:
 

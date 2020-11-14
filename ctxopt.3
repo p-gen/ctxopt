@@ -103,8 +103,8 @@ Flags may be missing in this argument, in this case the missing flags
 will be given their default value which is given below.
 An empty string is of course allowed but must be given anyway.
 .sp
-For now, only two flags are understood: \fBstop_if_non_option\fP and
-\fBallow_abbreviations\fP\&.
+For now, only three flags are understood: \fBstop_if_non_option\fP,
+\fBallow_abbreviations\fP and \fBdisplay_usage_on_error\fP\&.
 .sp
 Their value can be \fByes\fP or \fBno\fP, \fB1\fP and \fB0\fP and also accepted.
 .INDENT 2.0
@@ -119,6 +119,12 @@ is \fB0\fP or \fBno\fP\&.
 Tells \fBctxopt\fP to try to guess a parameter name even if only its
 beginning is given. The default value of this flag is \fB1\fP or
 \fByes\fP\&.
+.TP
+.B display_usage_on_error
+If the setting is set to yes (default), the usage text for the
+relevant contexts is displayed in case of a fatal error.
+This may be useful to reduce the length of the error message and
+allow the user to see the error more easily.
 .UNINDENT
 .sp
 Example of content of the \fIflags\fP parameter:
