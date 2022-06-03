@@ -1,8 +1,5 @@
 .\" Man page generated from reStructuredText.
 .
-.TH CTXOPT 3 "2020" "" ""
-.SH NAME
-ctxopt \- An advanced command line options manager.
 .
 .nr rst2man-indent-level 0
 .
@@ -30,6 +27,9 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
+.TH "CTXOPT" 3 "2020" "" ""
+.SH NAME
+ctxopt \- An advanced command line options manager.
 .SH DESCRIPTION
 .sp
 \fBctxopt\fP provides an advanced way to parse and evaluate complex command
@@ -877,6 +877,15 @@ options previously mentioned.
 .sp
 Incompatible setting combinations are not checked and will be ignored
 or lead to undefined behaviors.
+.TP
+.B visible_in_help
+These settings allow you to indicate that certain options should
+not be visible in the help messages. A use case could be to keep
+certain options hidden.
+.sp
+A third parameter whose value (case insensitive) is \fByes\fP prevents
+the option from being visible and a value set to \fBno\fP (the default)
+forces if to be visible in the auto\-generated help messages.
 .UNINDENT
 .UNINDENT
 .nf

@@ -727,6 +727,15 @@ The API consists in the following functions:
     Incompatible setting combinations are not checked and will be ignored
     or lead to undefined behaviors.
 
+  visible_in_help
+    These settings allow you to indicate that certain options should
+    not be visible in the help messages. A use case could be to keep
+    certain options hidden.
+
+    A third parameter whose value (case insensitive) is **yes** prevents
+    the option from being visible and a value set to **no** (the default)
+    forces if to be visible in the auto-generated help messages.
+
 |
 
 * **int ctxopt_format_constraint(int** \
