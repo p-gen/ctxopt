@@ -616,19 +616,24 @@ ll_new(void)
 static void
 ll_free(ll_t * const list, void (*clean)(void *))
 {
-  void * data;
+  ll_node_t * node;
 
   if (list)
-    while (list->len > 0)
-    {
-      data = list->head->data;
-      ll_delete(list, list->head);
+  {
+    node = list->head;
 
+    while (node)
+    {
       /* Apply a custom cleaner if not NULL. */
       /* """"""""""""""""""""""""""""""""""" */
       if (clean)
-        clean(data);
+        clean(node->data);
+
+      ll_delete(list, node);
+
+      node = list->head;
     }
+  }
 }
 
 /* ==================================== */
@@ -782,10 +787,12 @@ ll_delete(ll_t * const list, ll_node_t * node)
 {
   if (list->head == list->tail)
   {
-    if (list->head != NULL)
-      list->head = list->tail = NULL;
-    else
+    /* We delete the last remaining element from the list. */
+    /* """"""""""""""""""""""""""""""""""""""""""""""""""" */
+    if (list->head == NULL)
       return 0;
+
+    list->head = list->tail = NULL;
   }
   else if (node->prev == NULL)
   {
@@ -803,9 +810,9 @@ ll_delete(ll_t * const list, ll_node_t * node)
     node->prev->next = node->next;
   }
 
-  --list->len;
-
   free(node);
+
+  --list->len; /* One less node in the list. */
 
   return 1;
 }
@@ -1143,7 +1150,8 @@ strappend(char * str, ...)
 
   va_end(args);
 
-  str = xrealloc(str, l);
+  if (l > 0)
+    str = xrealloc(str, l);
 
   va_start(args, str);
   s = va_arg(args, char *);
