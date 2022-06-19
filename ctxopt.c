@@ -126,11 +126,6 @@ ll_insert_before(ll_t * const list, ll_node_t * node, void * const data);
 static int
 ll_delete(ll_t * const list, ll_node_t * node);
 
-#if 0 /* Unused yet. */
-static ll_node_t *
-ll_find(ll_t * const, void * const, int (*)(const void *, const void *));
-#endif
-
 static void
 ll_init(ll_t * list);
 
@@ -814,31 +809,6 @@ ll_delete(ll_t * const list, ll_node_t * node)
 
   return 1;
 }
-
-#if 0 /* Unused yet */
-/* ======================================================================== */
-/* Find a node in the list containing data. Return the node pointer or NULL */
-/* if not found.                                                            */
-/* A comparison function must be provided to compare a and b (strcmp like). */
-/* ======================================================================== */
-static ll_node_t *
-ll_find(ll_t * const list, void * const data,
-        int (*cmpfunc)(const void * a, const void * b))
-{
-  ll_node_t * node;
-
-  if (NULL == (node = list->head))
-    return NULL;
-
-  do
-  {
-    if (0 == cmpfunc(node->data, data))
-      return node;
-  } while (NULL != (node = node->next));
-
-  return NULL;
-}
-#endif
 
 /* ==================================================================== */
 /* Allocate and fill an array of strings from a list.                   */
