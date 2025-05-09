@@ -1,5 +1,5 @@
 /* ################################################################### */
-/* Copyright 2020, Pierre Gentile (p.gen.progs@gmail.com)              */
+/* Copyright 2015, Pierre Gentile (p.gen.progs@gmail.com)              */
 /*                                                                     */
 /* This Source Code Form is subject to the terms of the Mozilla Public */
 /* License, v. 2.0. If a copy of the MPL was not distributed with this */
@@ -7,6 +7,7 @@
 /* ################################################################### */
 
 #include <errno.h>
+#include <stddef.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1270,7 +1271,7 @@ get_word(char *str, char *buf, size_t len)
 
   /* Get the word. */
   /*"""""""""""""" */
-  while (*s && !isspace(*s) && s - str < len)
+  while (*s && !isspace(*s) && s - str < (ptrdiff_t)len)
     s++;
 
   strncpy(buf, str, s - str);
@@ -1356,10 +1357,10 @@ struct ctx_s
   char *name;
   ll_t *opt_list;    /* list of options allowed in this context.      */
   ll_t *incomp_list; /* list of strings containing incompatible names *
-                       | of options separated by spaces or tabs.       */
+                      | of options separated by spaces or tabs.       */
   ll_t *req_list;    /* list of strings containing an option name and *
-                       | all the option names where at least one of    *
-                       | them is required to be also present.          */
+                      | all the option names where at least one of    *
+                      | them is required to be also present.          */
 
   int (*action)(char  *name,
                 int    type,
@@ -1401,7 +1402,7 @@ struct opt_s
   char *next_ctx; /* new context this option may lead to     */
   ll_t *ctx_list; /* list of contexts allowing this option.  */
   char *params;   /* string containing all the parameters of *
-                    | the option.                             */
+                   | the option.                             */
 
   void (*action)(                    /* The option associated action.     */
                  char  *ctx_name,    /* context name.                     */
@@ -1416,8 +1417,8 @@ struct opt_s
   );
 
   int visible_in_help; /* visibility in help.                                */
-  int nb_data; /* number of the data pointers passed as argument to action. */
-  void **data; /* array of data pointers passed as argument to action.      */
+  int nb_data; /* number of the data pointers passed as argument to action.  */
+  void **data; /* array of data pointers passed as argument to action.       */
 
   int args;     /* 1 if this option takes arguments else 0.                  */
   int optional; /* 1 if the option is optional, else 0.                      */
@@ -1429,7 +1430,7 @@ struct opt_s
   char opt_count_oper;   /* <, = or >                                        */
   int  opt_count_mark;   /* Value to be compared to with opt_count_oper.     */
 
-  char *arg; /* symbolic text after # describing the option argument.       */
+  char *arg; /* symbolic text after # describing the option argument.        */
 
   int optional_args; /* 1 of option is optional else 0.                      */
   int multiple_args; /* 1 is option can appear more than once in a context   *
@@ -1443,10 +1444,10 @@ struct opt_s
   int eval_first; /* 1 if this option must be evaluated before the options   *
                    | without this mark.                                      */
 
-  ll_t *eval_before_list; /* List of pointers on options which must be      *
-                            | evaluated before this option.                  */
+  ll_t *eval_before_list; /* List of pointers on options which must be       *
+                           | evaluated before this option.                   */
 
-  ll_t *constraints_list; /* List of constraint check functions pointers.   */
+  ll_t *constraints_list; /* List of constraint check functions pointers.    */
 };
 
 /* Context instance structure. */
@@ -1455,14 +1456,14 @@ struct ctx_inst_s
 {
   ctx_t      *ctx;             /* the context whose this is an instance of  */
   ctx_inst_t *prev_ctx_inst;   /* ctx_inst of the opt_inst which led to the *
-                                 | creation of this ctx_inst structure.      */
+                                | creation of this ctx_inst structure.      */
   opt_inst_t *gen_opt_inst;    /* opt_inst which led to the creation of a   *
-                                 | instance of this structure.               */
+                                | instance of this structure.               */
   ll_t       *incomp_bst_list; /* list of seen_opt_t BST.                   */
   void       *seen_opt_bst;    /* tree of seen_opt_t.                       */
   ll_t       *opt_req_list;    /* list of req_t.                            */
   ll_t       *opt_inst_list;   /* The list of option instances in this      *
-                                 | context instance.                         */
+                                | context instance.                         */
   char       *par_name;        /* parameter which created this instance.    */
 };
 
@@ -1475,7 +1476,7 @@ struct opt_inst_s
   char       *par;           /* The parameter which led to this creation. */
   ll_t       *values_list;   /* The list of arguments of this option.     */
   ctx_inst_t *next_ctx_inst; /* The new context instance this option.     *
-                               | instance may create.                      */
+                              | instance may create.                      */
 };
 
 /* Structure used to check if an option has bee seen or not */
@@ -1496,7 +1497,7 @@ struct req_s
 {
   opt_t *opt;         /* Option that asks for other options.    */
   ll_t  *or_opt_list; /* Required options, at least one of them *
-                       |  must be present.                       */
+                       |  must be present.                      */
 };
 
 /* Parameter structure which links a parameter to the option it belongs to. */
@@ -1515,18 +1516,18 @@ struct constraint_s
   int    nb_args;
   char **args;
   char  *to_free; /* pointer to the original string in which the array in *
-                    | args points to. This pointer is kept there to allow  *
-                    | it to be freed.                                      */
+                   | args points to. This pointer is kept there to allow  *
+                   | it to be freed.                                      */
 };
 
 state_t           *cur_state      = NULL; /* Current analysis state.        */
 static ll_t       *cmdline_list   = NULL; /* List of interpreted CLI words  *
-                                            | serves as the basis for the    *
-                                            | analysis of the parameters.    */
+                                           | serves as the basis for the    *
+                                           | analysis of the parameters.    */
 static ctx_t      *main_ctx       = NULL; /* initial context.               */
 static ctx_inst_t *first_ctx_inst = NULL; /* Pointer to the fist context    *
-                                            | instance which holds the       *
-                                            | options instances.             */
+                                           | instance which holds the       *
+                                           | options instances.             */
 static ll_t       *ctx_inst_list  = NULL; /* List of the context instances. */
 
 /* ======================================================= */
@@ -2731,7 +2732,7 @@ opt_parse(char *s, opt_t **opt)
       goto success;
     }
     else if (opt_args == 0) /* # was not read it is possibly the start *
-                             * of another option.                      */
+                             | of another option.                      */
       goto success;
     else
     {
@@ -3286,9 +3287,9 @@ ctxopt_build_cmdline_list(int nb_words, char **words)
   cmdline_list = ll_new();
 
   start_node = cmdline_list->head; /* In the following loop start_node will *
-                                    * contain a pointer to the current      *
-                                    * word stripped from its leading        *
-                                    * sequence of {, }.                     */
+                                    | contain a pointer to the current      *
+                                    | word stripped from its leading        *
+                                    | sequence of {, }.                     */
   for (i = 0; i < nb_words; i++)
   {
     size_t len = strlen(words[i]);
@@ -3419,7 +3420,7 @@ ctxopt_build_cmdline_list(int nb_words, char **words)
       }
     }
     else if (strcmp(word, "-") == 0) /* A single - is a legal argument, not *
-                                      * a parameter. Protect it.            */
+                                      | a parameter. Protect it.            */
     {
       free(node->data);
       node->data = xstrdup("\\-");
@@ -3485,7 +3486,7 @@ ctxopt_analyze(int nb_words, char **words, int *nb_rem_args, char ***rem_args)
 {
   char *ctxopt_debug_env; /* Environment variable CTXOPT_DEBUG content.  */
   int   ctxopt_debug;     /* 1 if ctxopt_debug_env is set and not empty. *
-                            | 0 if ctxopt_debug_env is unset or empty.    */
+                           | 0 if ctxopt_debug_env is unset or empty.    */
 
   ctx_t      *ctx;
   opt_t      *opt = NULL;
@@ -3792,7 +3793,7 @@ ctxopt_analyze(int nb_words, char **words, int *nb_rem_args, char ***rem_args)
             ll_t      *before_list = opt->eval_before_list;
             ll_node_t *before_node = before_list->head;
 
-            ll_node_t *target_node = NULL; /* If not NULL, the new node   *
+            ll_node_t *target_node = NULL; /* If not NULL, the new node    *
                                             |  will be inserted before it. */
 
             /* For each entry in eval_before_list, try to find if it       */
@@ -4455,7 +4456,7 @@ ctxopt_re_constraint(int nb_args, char **args, char *value, char *par)
 int
 ctxopt_range_constraint(int nb_args, char **args, char *value, char *par)
 {
-  long  min, max;
+  long  min = LONG_MIN, max = LONG_MAX;
   char  c;
   char *ptr;
   int   n;
@@ -4466,6 +4467,7 @@ ctxopt_range_constraint(int nb_args, char **args, char *value, char *par)
   if (nb_args != 2)
     fatal_internal("Range constraint, invalid number of parameters.");
 
+  n = 0;
   if (strcmp(args[0], ".") == 0)
     max_only = 1;
   else
@@ -4474,6 +4476,7 @@ ctxopt_range_constraint(int nb_args, char **args, char *value, char *par)
   if (!max_only && n != 1)
     fatal_internal("Range constraint, min: invalid parameters.");
 
+  n = 0;
   if (strcmp(args[1], ".") == 0)
     min_only = 1;
   else
@@ -4598,7 +4601,7 @@ ctxopt_add_opt_settings(settings s, ...)
     /* """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" */
     case parameters:
     {
-      char *opt_name;
+      char *opt_name = NULL;
       char *params;
 
       /* The second argument must be a string containing: */
