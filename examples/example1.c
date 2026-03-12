@@ -7,17 +7,43 @@
 /* ****************** */
 
 void
-user_action(char * ctx_name, char * opt_name, char * param, int nb_values,
-            char ** values, int nb_opt_data, void ** opt_data, int nb_ctx_data,
-            void ** ctx_data)
+help_action(char  *ctx_name,
+            char  *opt_name,
+            char  *param,
+            int    nb_values,
+            char **values,
+            int    nb_opt_data,
+            void **opt_data,
+            int    nb_ctx_data,
+            void **ctx_data)
+{
+  ctxopt_ctx_disp_usage(output_stderr, ctx_name, exit_after);
+}
+
+void
+user_action(char  *ctx_name,
+            char  *opt_name,
+            char  *param,
+            int    nb_values,
+            char **values,
+            int    nb_opt_data,
+            void **opt_data,
+            int    nb_ctx_data,
+            void **ctx_data)
 {
   printf("User %s\n", values[0]);
 }
 
 void
-groups_action(char * ctx_name, char * opt_name, char * param, int nb_values,
-              char ** values, int nb_opt_data, void ** opt_data,
-              int nb_ctx_data, void ** ctx_data)
+groups_action(char  *ctx_name,
+              char  *opt_name,
+              char  *param,
+              int    nb_values,
+              char **values,
+              int    nb_opt_data,
+              void **opt_data,
+              int    nb_ctx_data,
+              void **ctx_data)
 {
   int v;
 
@@ -33,30 +59,34 @@ groups_action(char * ctx_name, char * opt_name, char * param, int nb_values,
 /* ************* */
 
 int
-main(int argc, char * argv[])
+main(int argc, char *argv[])
 {
-  int     nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
-  char ** rem_args    = NULL; /* Remaining arguments string array.      */
+  int    nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
+  char **rem_args    = NULL; /* Remaining arguments string array.      */
 
   /* initialize ctxopt */
   /* """"""""""""""""" */
-  ctxopt_init(argv[0], "stop_if_non_option=Yes "
-                       "allow_abbreviations=no ");
+  ctxopt_init(argv[0],
+              "stop_if_non_option=Yes "
+              "allow_abbreviations=no ");
 
   /* Create new contexts with their allowed options */
   /* """""""""""""""""""""""""""""""""""""""""""""" */
-  ctxopt_new_ctx("main", "[user>ctx1... #<string>]");
+  ctxopt_new_ctx("main", "[user>ctx1... #<string>] [help]");
+
   ctxopt_new_ctx("ctx1", "group #<string>...");
 
   /* Attach parameters to options */
   /* """""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(parameters, "user", "-u -user");
   ctxopt_add_opt_settings(parameters, "group", "-g -groups");
+  ctxopt_add_opt_settings(parameters, "help", "-h -usage -help");
 
   /* Attach a callback action to options */
   /* """"""""""""""""""""""""""""""""""" */
   ctxopt_add_opt_settings(actions, "user", user_action, NULL);
   ctxopt_add_opt_settings(actions, "group", groups_action, NULL);
+  ctxopt_add_opt_settings(actions, "help", help_action, NULL);
 
   /* Parse and check the command line options */
   /* """""""""""""""""""""""""""""""""""""""" */

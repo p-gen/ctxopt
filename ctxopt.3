@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "CTXOPT" 3 "2020" "" ""
+.TH "CTXOPT" "3" "2020" ""
 .SH NAME
 ctxopt \- An advanced command line options manager.
 .SH DESCRIPTION
@@ -42,16 +42,16 @@ in your projects.
 The command line can be considered as a tree of contexts.
 This offers the possibility of having a hierarchy of option groups.
 .sp
-Each option has a set of parameters which must start with a single dash
+Each option has a set of parameters which must start with a signe dash
 and may appear in the command line.
 .sp
-In order not to change habits, the double dash notation popularized by
-the GNU \fBgetopt_long\fP function for long options is also accepted and
-automatically and silently converted to notation with a single dash.
+In order to maintain consistency, the double\-dash notation popularized by
+the GNU \fBgetopt_long\fP function for long options is also accepted and is
+automatically and silently converted to single\-dash notation.
 .sp
-These parameters are not limited to a dash followed by single letter.
-In what follows, I will consider for simplicity that these are the options
-which are visible in the command line and not one of their parameters.
+When a parameter consists of a word preceded by a dash, \fBctxopt\fP first
+checks whether that word (or the beginning of that word) refers to an option
+before attempting to split it until it finds a prefix that matches an option.
 .sp
 Unless explicitly stated, the options are processed in the same order
 as they appear in the command line, from left to right.
@@ -80,14 +80,68 @@ The symbol \fB}\fP forces the end of a context.
 .sp
 The presence of \fB{\fP and \fB}\fP is purely optional and rarely necessary
 but can help readability.
-.SS FUNCTIONS
+.SS ERRORS
+.sp
+\fBctxopt\fP generates tow kinds of errors, fatal and internal fatal errors.
+.sp
+Fatal error are generated when a problem occurs when parsing the user\(aqs
+provided command line.
+.sp
+Internal fatal error are generated when the users provides \fBctxopt\fP
+incoherent data or in case of memory exhaustion.
+.sp
+All these errors are written to the standard error stream.
+.sp
+\fBctxopt\fP allows users to automatically display usage text after an
+error message by providing the special command\-line argument
+\fB\-usage_on_error\fP, which calls the \fBctxopt_ctx_disp_usage\fP function.
+.sp
+\fB\-usage_on_error\fP is always available whatever the context.
+.SH RETURN VALUES
+.sp
+In case of a fatal error, \fBctxopt\fP exits with one of the following error
+code defined in \fBctxopt.h\fP:
+.INDENT 0.0
+.IP \(bu 2
+\fBCTXOPTMISPAR\fP: A required option in this context, is missing.
+.IP \(bu 2
+\fBCTXOPTREQPAR\fP: At least one option, required by another option, is missing
+(see \fBctxopt_add_ctx_settings\fP).
+.IP \(bu 2
+\fBCTXOPTMISARG\fP: A mandatory argument is missing.
+.IP \(bu 2
+\fBCTXOPTDUPOPT\fP: An option can only appear once in this context.
+.IP \(bu 2
+\fBCTXOPTUNKPAR\fP: A parameter doesn\(aqt correspond to any option.
+.IP \(bu 2
+\fBCTXOPTINCOPT\fP: An option in incompatible with another option in
+this context.
+.IP \(bu 2
+\fBCTXOPTCTEOPT\fP: Bad number of occurrences of an option in this context.
+.IP \(bu 2
+\fBCTXOPTCTLOPT\fP: Too many occurrences of an option in this context.
+.IP \(bu 2
+\fBCTXOPTCTGOPT\fP: Not enough occurrences of an option in this context.
+.IP \(bu 2
+\fBCTXOPTCTEARG\fP: Bad number of arguments for this option.
+.IP \(bu 2
+\fBCTXOPTCTLARG\fP: Too many arguments for this option.
+.IP \(bu 2
+\fBCTXOPTCTGARG\fP: Not enough arguments for this option.
+.IP \(bu 2
+\fBCTXOPTUNXARG\fP: This option doesn\(aqt take any argument.
+.UNINDENT
+.sp
+In case of an internal error, \fBctxopt\fP exits with the standard
+\fBEXIT_FAILURE\fP code.
+.SH API
 .sp
 The API consists in the following functions:
 .INDENT 0.0
 .IP \(bu 2
 \fBvoid ctxopt_init(char *\fP \fIprog_name\fP\fB, char *\fP \fIflags\fP\fB);\fP
 .sp
-This function initializes the internal structures uses by \fBctxopt\fP\&.
+This function initializes the internal structures used by \fBctxopt\fP\&.
 It is mandatory and must me called first.
 .sp
 Its first argument (\fIprog_name\fP) is typically the content of \fBargv[0]\fP
@@ -103,8 +157,8 @@ Flags may be missing in this argument, in this case the missing flags
 will be given their default value which is given below.
 An empty string is of course allowed but must be given anyway.
 .sp
-For now, only three flags are understood: \fBstop_if_non_option\fP,
-\fBallow_abbreviations\fP and \fBdisplay_usage_on_error\fP\&.
+For now, only two flags are understood: \fBstop_if_non_option\fP and
+\fBallow_abbreviations\fP\&.
 .sp
 Their value can be \fByes\fP or \fBno\fP, \fB1\fP and \fB0\fP and also accepted.
 .INDENT 2.0
@@ -119,23 +173,15 @@ is \fB0\fP or \fBno\fP\&.
 Tells \fBctxopt\fP to try to guess a parameter name even if only its
 beginning is given. The default value of this flag is \fB1\fP or
 \fByes\fP\&.
-.TP
-.B display_usage_on_error
-If the setting is set to yes (default), the usage text for the
-relevant contexts is displayed in case of a fatal error.
-This may be useful to reduce the length of the error message and
-allow the user to see the error more easily.
 .UNINDENT
 .sp
 Example of content of the \fIflags\fP parameter:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-"stop_if_non_option=1 allow_abbreviations=No"
-.ft P
-.fi
+.EX
+\(dqstop_if_non_option=1 allow_abbreviations=No\(dq
+.EE
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -147,12 +193,12 @@ Example of content of the \fIflags\fP parameter:
 .IP \(bu 2
 \fBvoid ctxopt_new_ctx(char *\fP \fIname\fP\fB, char *\fP \fIopts_specs\fP\fB);\fP
 .sp
-The next thing to do after having called \fBctxopt_new_ctx\fP is to
+The next thing to do after having called \fBctxopt_init\fP is to
 define the contexts and its associated options.
 .sp
-Using this function, you can name the new context and its authorized
-options and determine their main characteristics with a syntax easy
-to understand.
+With this feature, you can create the new context and its allowed options,
+and define their main characteristics using an easy\-to\-understand syntax.
+.sp
 If they already exist in another context, then they must have the same
 signature (described below) as in their previous appearance.
 .sp
@@ -164,8 +210,8 @@ spaces according to the syntax below:
 .INDENT 2.0
 .TP
 .B opt
-A mandatory option named opt without parameter usable only one type in
-the context
+A mandatory option named \fBopt\fP without parameter usable only one
+type in the context
 .TP
 .B opt1 opt2
 Two mandatory option named \fBopt1\fP and \fBopt2\fP without argument.
@@ -232,15 +278,13 @@ Example:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-ctxopt_new_ctx("context1",
-               "[opt1>context2...] #arg1... [opt3]");
+.EX
+ctxopt_new_ctx(\(dqcontext1\(dq,
+               \(dq[opt1>context2...] #arg1... [opt3]\(dq);
 
-ctxopt_new_ctx("context2",
-               "[opt2 [#arg2]] [opt3]");
-.ft P
-.fi
+ctxopt_new_ctx(\(dqcontext2\(dq,
+               \(dq[opt2 [#arg2]] [opt3]\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -268,6 +312,7 @@ Note that \fBopt3\fP is legal in both contexts.
 .sp
 \fBopt2\fP, if present in the command line, will be evaluated in the
 context \fBcontext2\fP\&.
+.sp
 Note that, in this example, the \fBcontext2\fP can only be entered if
 \fBopt1\fP has previously been seen in the command line.
 Hence, \fBopt2\fP is only legal if \fBopt1\fP is present first.
@@ -276,7 +321,7 @@ Hence, \fBopt2\fP is only legal if \fBopt1\fP is present first.
 In fact, as \fBopt3\fP is optional in \fBcontext2\fP and if its action
 function is not interested in the name of the current context,
 then it could have been omitted from the second setting thanks to
-the backtracking: an option which is illegal in a context is retried
+the backtracking, an option which is illegal in a context is retried
 in the previous context in the hierarchy.
 .UNINDENT
 .UNINDENT
@@ -287,25 +332,35 @@ in the previous context in the hierarchy.
 .sp
 .INDENT 0.0
 .IP \(bu 2
-\fBvoid ctxopt_ctx_disp_usage(char *\fP \fIctx_name\fP\fB, usage_behaviour\fP \fIaction\fP\fB);\fP
+\fBvoid ctxopt_ctx_disp_usage(usage_output\fP \fIoutput\fP\fB, char *\fP \fIctx_name\fP\fB, usage_behaviour\fP \fIaction\fP\fB);\fP
 .sp
 This function builds and prints an usage help text for the
 specific context \fIctx_name\fP\&.
 The symbols used in this text are the same as those used when defining
 options in \fBctxopt_new_ctx\fP\&.
 .sp
-The parameter \fIaction\fP can take the following values:
+The parameter \fIoutput\fP must take one of the following values:
+.INDENT 2.0
+.TP
+.B output_stdout
+To write the usage test to the standard output stream.
+.TP
+.B output_stderr
+To write the usage test to the standard error stream.
+.UNINDENT
+.sp
+The parameter \fIaction\fP must take one the following values:
 .INDENT 2.0
 .TP
 .B continue_after
-The program is not stopped when this function returns.
+The program won\(aqt be stopped after calling this function.
 .TP
 .B exit_after
-The program is stopped with a non zero return code (typically 1)
-when this function returns.
+The program will be stopped with a non zero return code (typically 1)
+after the display of the usage text.
 .UNINDENT
 .sp
-The usage text is followed by a legend explaining the symbols meanings.
+The usage text contains a legend explaining the symbols meanings.
 This function is useful when associated with a \fBhelp\fP or \fBusage\fP
 option.
 .UNINDENT
@@ -315,14 +370,24 @@ option.
 .sp
 .INDENT 0.0
 .IP \(bu 2
-\fBvoid ctxopt_disp_usage(usage_behaviour\fP \fIaction\fP\fB);\fP
+\fBvoid ctxopt_disp_usage(usage_output\fP \fIoutput\fPusage_behaviour** \fIaction\fP\fB);\fP
 .sp
 This function is similar to the preceding one but displays the usage
 help text for all the defined contexts.
 It is useful when associated with a general \fBhelp\fP or \fBusage\fP
 option.
 .sp
-The parameter \fIaction\fP can take the following values:
+The parameter \fIoutput\fP must take one of the following values:
+.INDENT 2.0
+.TP
+.B output_stdout
+To write the usage test to the standard output stream.
+.TP
+.B output_stderr
+To write the usage test to the standard error stream.
+.UNINDENT
+.sp
+The parameter \fIaction\fP must take one of the following values:
 .INDENT 2.0
 .TP
 .B continue_after
@@ -382,11 +447,9 @@ prototype:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void (*) (errors err, state_t * state);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -399,8 +462,7 @@ This structure available in \fBctxopt.h\fP is:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 typedef struct
 {
   char * prog_name;        /* base name of the program name.         */
@@ -415,8 +477,7 @@ typedef struct
   char * pre_opt_par_name; /* parameter just before the current one. */
   char * cur_opt_par_name; /* current parameter.                     */
 } state_t;
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -426,11 +487,9 @@ Example:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 ctxopt_add_global_settings(error_functions, CTXOPTMISPAR, error);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -461,13 +520,11 @@ Example of \fBincompatibilities\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void ctxopt_add_ctx_settings(incompatibilities,
-                             "context1",
-                             "opt1 opt2 opt3");
-.ft P
-.fi
+                             \(dqcontext1\(dq,
+                             \(dqopt1 opt2 opt3\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -487,13 +544,11 @@ Example of \fBrequirements\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void ctxopt_add_ctx_settings(requirements;
-                             "context1",
-                             "opt1 opt2 opt3");
-.ft P
-.fi
+                             \(dqcontext1\(dq,
+                             \(dqopt1 opt2 opt3\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -524,15 +579,13 @@ In this setting, the last parameter must be \fBNULL\fP\&.
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 int (*) (char     * name1,   /* Context name */
          direction  status,  /* entering or exiting */
          char     * name2,   /* previous or next context */
          int        nb_data, /* Number of data */
          void    ** data     /* Data */);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -568,15 +621,13 @@ Example of \fBactions\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void ctxopt_add_ctx_settings(actions,
-                             "context1",
+                             \(dqcontext1\(dq,
                              action,
                              &data_1, &data_2, &data_3,
                              NULL);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -625,13 +676,11 @@ Example of \fBparameters\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 ctxopt_add_opt_settings(parameters,
-                        "opt1",
-                        "\-p \-parm \-p1");
-.ft P
-.fi
+                        \(dqopt1\(dq,
+                        \(dq\-p \-parm \-p1\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -658,8 +707,7 @@ match the following prototype:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void (*) (char  * ctx_name,     /* Context name */
           char  * opt_name,     /* Option name  */
           char  * param,        /* Parameter name */
@@ -669,8 +717,7 @@ void (*) (char  * ctx_name,     /* Context name */
           void ** opt_data,     /* Array of option data passed */
           int     nb_ctx_data,  /* Number of context data passed */
           void ** ctx_data      /* Array of context data passed */)
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .INDENT 7.0
@@ -719,8 +766,7 @@ Example of \fBactions\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 void action(char * ctx_name,
             char * opt_name,
             char * param,
@@ -733,11 +779,10 @@ void action(char * ctx_name,
 
 \&...
 
-void ctxopt_add_opt_settings(actions, "opt1", action,
+void ctxopt_add_opt_settings(actions, \(dqopt1\(dq, action,
                              &data_1, &data_2, &data_3,
                              NULL);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -766,11 +811,9 @@ The constraint function must match the following prototype:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 int (*) (int nb_args, char ** args, char * value, char * parameter);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -804,14 +847,12 @@ constraint checker function:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 ctxopt_add_opt_settings(constraints,
-                        "opt1",
+                        \(dqopt1\(dq,
                         ctxopt_re_constraint,
-                        "[^:]+:.+");
-.ft P
-.fi
+                        \(dq[^:]+:.+\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -820,11 +861,9 @@ the extended regular expression:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 [^:]+:.+
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -841,13 +880,11 @@ Example of \fBbefore\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 ctxopt_add_opt_settings(before,
-                        "opt1",
-                        "opt2 opt3");
-.ft P
-.fi
+                        \(dqopt1\(dq,
+                        \(dqopt2 opt3\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -860,13 +897,11 @@ Example of \fBafter\fP setting:
 .INDENT 7.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 ctxopt_add_opt_settings(after,
-                        "opt2",
-                        "opt3 opt4");
-.ft P
-.fi
+                        \(dqopt2\(dq,
+                        \(dqopt3 opt4\(dq);
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -964,14 +999,12 @@ Example:
 .INDENT 2.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 int     res_argc;
 char ** res_argv;
 \&...
 ctxopt_analyze(argc\-1, argv+1, &res_argc, &res_argv);
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -999,7 +1032,7 @@ is set to any not\-empty value.
 If this is the case, informational messages about how \fBctxopt\fP
 analyses the command line are printed on the error output.
 .sp
-Each of them are prefixed with "CTXOPT_DEBUG: ".
+Each of them are prefixed with \(dqCTXOPT_DEBUG: \(dq.
 .SH AUTHOR
 Pierre Gentile p.gen.progs@gmail.com
 .SH COPYRIGHT

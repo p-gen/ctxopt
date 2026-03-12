@@ -1,8 +1,8 @@
 OBJS    = hello.o example1.o example2.o ctxopt.o
 BINS    = hello example1 example2
 OUT     = hello
-CC      = c99
-CFLAGS  = -g -O
+CC      = gcc
+CFLAGS  = -g -O2
 LDFLAGS =
 
 all: hello example1 example2

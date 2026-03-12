@@ -9,10 +9,10 @@
 /* ***************** */
 
 static void
-hexdump(void * mem, int len)
+hexdump(void *mem, int len)
 {
-  uint8_t * data = (uint8_t *)mem;
-  int       pos  = 0;
+  uint8_t *data = (uint8_t *)mem;
+  int      pos  = 0;
   while (pos < len)
   {
     /* Print address */
@@ -53,10 +53,26 @@ hexdump(void * mem, int len)
 
 /* Callback functions */
 /* ****************** */
+void
+help_action(char  *ctx_name,
+            char  *opt_name,
+            char  *param,
+            int    nb_values,
+            char **values,
+            int    nb_opt_data,
+            void **opt_data,
+            int    nb_ctx_data,
+            void **ctx_data)
+{
+  ctxopt_disp_usage(output_stdout, exit_after);
+}
 
-int
-second_action(char * ctx_name, direction status, char * prev_ctx_name,
-              int nb_data, void ** data)
+void
+second_action(char     *ctx_name,
+              direction status,
+              char     *prev_ctx_name,
+              int       nb_data,
+              void    **data)
 
 {
   puts("Context action");
@@ -83,9 +99,15 @@ second_action(char * ctx_name, direction status, char * prev_ctx_name,
 }
 
 void
-opt_action(char * ctx_name, char * opt_name, char * param, int nb_values,
-           char ** values, int nb_opt_data, void ** opt_data, int nb_ctx_data,
-           void ** ctx_data)
+opt_action(char  *ctx_name,
+           char  *opt_name,
+           char  *param,
+           int    nb_values,
+           char **values,
+           int    nb_opt_data,
+           void **opt_data,
+           int    nb_ctx_data,
+           void **ctx_data)
 {
   int v;
 
@@ -135,27 +157,29 @@ opt_action(char * ctx_name, char * opt_name, char * param, int nb_values,
 /* ************* */
 
 int
-main(int argc, char * argv[])
+main(int argc, char *argv[])
 {
-  int     nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
-  char ** rem_args    = NULL; /* Remaining arguments string array.      */
+  int    nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
+  char **rem_args    = NULL; /* Remaining arguments string array.      */
 
   int  ctx_data[] = { 1, 2, 3 };
   char opt_data[] = "test";
 
   /* initialize cop */
   /* """""""""""""" */
-  ctxopt_init(argv[0], "stop_if_non_option=0 "
-                       "allow_abbreviations=1 ");
+  ctxopt_init(argv[0],
+              "stop_if_non_option=0 "
+              "allow_abbreviations=1 ");
 
   /* Create new contexts with their allowed options */
   /* """""""""""""""""""""""""""""""""""""""""""""" */
-  ctxopt_new_ctx("first", "[a>second... #<string>...]");
-  ctxopt_new_ctx("second", "[b>third [#<string>]]");
-  ctxopt_new_ctx("third", "[c #<string>]");
+  ctxopt_new_ctx("first", "[a>second... #<string>...] [*help]");
+  ctxopt_new_ctx("second", "[b>third [#<string>]] [*help]");
+  ctxopt_new_ctx("third", "[c #<string>] [*help]");
 
   /* Attach parameters to options */
   /* """""""""""""""""""""""""""" */
+  ctxopt_add_opt_settings(parameters, "help", "-h -u -usage -help");
   ctxopt_add_opt_settings(parameters, "a", "-a");
   ctxopt_add_opt_settings(parameters, "b", "-b");
   ctxopt_add_opt_settings(parameters, "c", "-c");
@@ -166,6 +190,7 @@ main(int argc, char * argv[])
 
   /* Attach a callback action to options */
   /* """"""""""""""""""""""""""""""""""" */
+  ctxopt_add_opt_settings(actions, "help", help_action, NULL);
   ctxopt_add_opt_settings(actions, "a", opt_action, NULL);
   ctxopt_add_opt_settings(actions, "b", opt_action, &opt_data, NULL);
   ctxopt_add_opt_settings(actions, "c", opt_action, NULL);

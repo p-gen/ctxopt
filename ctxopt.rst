@@ -26,16 +26,16 @@ CONCEPTS
 The command line can be considered as a tree of contexts.
 This offers the possibility of having a hierarchy of option groups.
 
-Each option has a set of parameters which must start with a single dash
+Each option has a set of parameters which must start with a signe dash
 and may appear in the command line.
 
-In order not to change habits, the double dash notation popularized by
-the GNU **getopt_long** function for long options is also accepted and
-automatically and silently converted to notation with a single dash.
+In order to maintain consistency, the double-dash notation popularized by
+the GNU **getopt_long** function for long options is also accepted and is
+automatically and silently converted to single-dash notation.
 
-These parameters are not limited to a dash followed by single letter.
-In what follows, I will consider for simplicity that these are the options
-which are visible in the command line and not one of their parameters.
+When a parameter consists of a word preceded by a dash, **ctxopt** first
+checks whether that word (or the beginning of that word) refers to an option
+before attempting to split it until it finds a prefix that matches an option.
 
 Unless explicitly stated, the options are processed in the same order
 as they appear in the command line, from left to right.
@@ -65,8 +65,52 @@ The symbol ``}`` forces the end of a context.
 The presence of ``{`` and ``}`` is purely optional and rarely necessary
 but can help readability.
 
-FUNCTIONS
----------
+ERRORS
+------
+
+**ctxopt** generates tow kinds of errors, fatal and internal fatal errors.
+
+Fatal error are generated when a problem occurs when parsing the user's
+provided command line.
+
+Internal fatal error are generated when the users provides **ctxopt**
+incoherent data or in case of memory exhaustion.
+
+All these errors are written to the standard error stream.
+
+**ctxopt** allows users to automatically display usage text after an
+error message by providing the special command-line argument
+**-usage_on_error**, which calls the **ctxopt_ctx_disp_usage** function.
+
+**-usage_on_error** is always available whatever the context.
+
+RETURN VALUES
+=============
+
+In case of a fatal error, **ctxopt** exits with one of the following error
+code defined in **ctxopt.h**:
+
+- ``CTXOPTMISPAR``: A required option in this context, is missing.
+- ``CTXOPTREQPAR``: At least one option, required by another option, is missing
+  (see **ctxopt_add_ctx_settings**).
+- ``CTXOPTMISARG``: A mandatory argument is missing.
+- ``CTXOPTDUPOPT``: An option can only appear once in this context.
+- ``CTXOPTUNKPAR``: A parameter doesn't correspond to any option.
+- ``CTXOPTINCOPT``: An option in incompatible with another option in
+  this context.
+- ``CTXOPTCTEOPT``: Bad number of occurrences of an option in this context.
+- ``CTXOPTCTLOPT``: Too many occurrences of an option in this context.
+- ``CTXOPTCTGOPT``: Not enough occurrences of an option in this context.
+- ``CTXOPTCTEARG``: Bad number of arguments for this option.
+- ``CTXOPTCTLARG``: Too many arguments for this option.
+- ``CTXOPTCTGARG``: Not enough arguments for this option.
+- ``CTXOPTUNXARG``: This option doesn't take any argument.
+
+In case of an internal error, **ctxopt** exits with the standard
+``EXIT_FAILURE`` code.
+
+API
+===
 
 The API consists in the following functions:
 
@@ -76,7 +120,7 @@ The API consists in the following functions:
   *flags*\
   **);**
 
-  This function initializes the internal structures uses by **ctxopt**.
+  This function initializes the internal structures used by **ctxopt**.
   It is mandatory and must me called first.
 
   Its first argument (*prog_name*) is typically the content of ``argv[0]``
@@ -92,8 +136,8 @@ The API consists in the following functions:
   will be given their default value which is given below.
   An empty string is of course allowed but must be given anyway.
 
-  For now, only three flags are understood: **stop_if_non_option**,
-  **allow_abbreviations** and **display_usage_on_error**.
+  For now, only two flags are understood: **stop_if_non_option** and
+  **allow_abbreviations**.
 
   Their value can be **yes** or **no**, **1** and **0** and also accepted.
 
@@ -107,12 +151,6 @@ The API consists in the following functions:
     Tells **ctxopt** to try to guess a parameter name even if only its
     beginning is given. The default value of this flag is **1** or
     **yes**.
-
-  display_usage_on_error
-    If the setting is set to yes (default), the usage text for the
-    relevant contexts is displayed in case of a fatal error.
-    This may be useful to reduce the length of the error message and
-    allow the user to see the error more easily.
 
   Example of content of the *flags* parameter:
 
@@ -128,12 +166,12 @@ The API consists in the following functions:
   *opts_specs*\
   **);**
 
-  The next thing to do after having called **ctxopt_new_ctx** is to
+  The next thing to do after having called **ctxopt_init** is to
   define the contexts and its associated options.
 
-  Using this function, you can name the new context and its authorized
-  options and determine their main characteristics with a syntax easy
-  to understand.
+  With this feature, you can create the new context and its allowed options,
+  and define their main characteristics using an easy-to-understand syntax.
+
   If they already exist in another context, then they must have the same
   signature (described below) as in their previous appearance.
 
@@ -144,8 +182,8 @@ The API consists in the following functions:
   spaces according to the syntax below:
 
   opt
-    A mandatory option named opt without parameter usable only one type in
-    the context
+      A mandatory option named **opt** without parameter usable only one
+      type in the context
 
   opt1 opt2
       Two mandatory option named **opt1** and **opt2** without argument.
@@ -229,6 +267,7 @@ The API consists in the following functions:
 
     **opt2**, if present in the command line, will be evaluated in the
     context **context2**.
+
     Note that, in this example, the **context2** can only be entered if
     **opt1** has previously been seen in the command line.
     Hence, **opt2** is only legal if **opt1** is present first.
@@ -237,12 +276,14 @@ The API consists in the following functions:
     In fact, as **opt3** is optional in **context2** and if its action
     function is not interested in the name of the current context,
     then it could have been omitted from the second setting thanks to
-    the backtracking: an option which is illegal in a context is retried
+    the backtracking, an option which is illegal in a context is retried
     in the previous context in the hierarchy.
 
 |
 
-* **void ctxopt_ctx_disp_usage(char *** \
+* **void ctxopt_ctx_disp_usage(usage_output** \
+  *output*\
+  **, char *** \
   *ctx_name*\
   **, usage_behaviour** \
   *action*\
@@ -253,22 +294,32 @@ The API consists in the following functions:
   The symbols used in this text are the same as those used when defining
   options in **ctxopt_new_ctx**.
 
-  The parameter *action* can take the following values:
+  The parameter *output* must take one of the following values:
+
+  output_stdout
+    To write the usage test to the standard output stream.
+
+  output_stderr
+    To write the usage test to the standard error stream.
+
+  The parameter *action* must take one the following values:
 
   continue_after
-    The program is not stopped when this function returns.
+    The program won't be stopped after calling this function.
 
   exit_after
-    The program is stopped with a non zero return code (typically 1)
-    when this function returns.
+    The program will be stopped with a non zero return code (typically 1)
+    after the display of the usage text.
 
-  The usage text is followed by a legend explaining the symbols meanings.
+  The usage text contains a legend explaining the symbols meanings.
   This function is useful when associated with a **help** or **usage**
   option.
 
 |
 
-* **void ctxopt_disp_usage(usage_behaviour** \
+* **void ctxopt_disp_usage(usage_output** \
+  *output*\
+  usage_behaviour** \
   *action*\
   **);**
 
@@ -277,7 +328,15 @@ The API consists in the following functions:
   It is useful when associated with a general **help** or **usage**
   option.
 
-  The parameter *action* can take the following values:
+  The parameter *output* must take one of the following values:
+
+  output_stdout
+    To write the usage test to the standard output stream.
+
+  output_stderr
+    To write the usage test to the standard error stream.
+
+  The parameter *action* must take one of the following values:
 
   continue_after
     The program is not stopped when this function returns.

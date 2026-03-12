@@ -5,11 +5,30 @@
 
 /* Callback functions */
 /* ****************** */
+void
+usage_action(char  *ctx_name,
+             char  *opt_name,
+             char  *param,
+             int    nb_values,
+             char **values,
+             int    nb_opt_data,
+             void **opt_data,
+             int    nb_ctx_data,
+             void **ctx_data)
+{
+  ctxopt_ctx_disp_usage(output_stdout, ctx_name, exit_after);
+}
 
 void
-name_action(char * ctx_name, char * opt_name, char * param, int nb_values,
-            char ** values, int nb_opt_data, void ** opt_data, int nb_ctx_data,
-            void ** ctx_data)
+name_action(char  *ctx_name,
+            char  *opt_name,
+            char  *param,
+            int    nb_values,
+            char **values,
+            int    nb_opt_data,
+            void **opt_data,
+            int    nb_ctx_data,
+            void **ctx_data)
 {
   int v;
 
@@ -26,27 +45,32 @@ name_action(char * ctx_name, char * opt_name, char * param, int nb_values,
 /* ************* */
 
 int
-main(int argc, char * argv[])
+main(int argc, char *argv[])
 {
-  int     nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
-  char ** rem_args    = NULL; /* Remaining arguments string array.      */
+  int    nb_rem_args = 0;    /* Nb of remaining unprocessed arguments. */
+  char **rem_args    = NULL; /* Remaining arguments string array.      */
 
   /* initialize cop */
   /* """""""""""""" */
-  ctxopt_init(argv[0], "stop_if_non_option=Yes "
-                       "allow_abbreviations=Yes ");
+  ctxopt_init(argv[0],
+              "stop_if_non_option=Yes "
+              "allow_abbreviations=Yes ");
 
   /* Create a new context with its  allowed options. */
   /* """"""""""""""""""""""""""""""""""""""""""""""" */
-  ctxopt_new_ctx("main", "[name... #<string>...]");
+  ctxopt_new_ctx("main",
+                 "[name... #<string>...] "
+                 "[usage] ");
 
-  /* Attach parameters to the name option */
-  /* """""""""""""""""""""""""""""""""""" */
+  /* Attach parameters to options */
+  /* """""""""""""""""""""""""""" */
+  ctxopt_add_opt_settings(parameters, "usage", "-u -h -usage -help");
   ctxopt_add_opt_settings(parameters, "name", "-n -name");
 
-  /* Attach a callback action to the name option */
-  /* """"""""""""""""""""""""""""""""""""""""""" */
+  /* Attach a callback options */
+  /* """"""""""""""""""""""""" */
   ctxopt_add_opt_settings(actions, "name", name_action, NULL);
+  ctxopt_add_opt_settings(actions, "usage", usage_action, NULL);
 
   /* Parse and check the command line options */
   /* """""""""""""""""""""""""""""""""""""""" */

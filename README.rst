@@ -187,7 +187,7 @@ Line 33:
   The **name** option is defined as an optional possible multiple option
   taking mandatory possibly multiple arguments.
   It is the ``#`` which indicates the presence of an argument,
-  ``<string>`` is just a decaration to clarify the meaning of this
+  ``<string>`` is just a declaration to clarify the meaning of this
   argument.
 
 Line 34:
