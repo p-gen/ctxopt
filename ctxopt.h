@@ -121,4 +121,7 @@ ctxopt_range_constraint(int nb_args, char **args, char *value, char *par);
 void
 ctxopt_free_memory(void);
 
+int
+ctxopt_usage_on_error(void);
+
 #endif

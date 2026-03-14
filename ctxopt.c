@@ -5140,3 +5140,12 @@ ctxopt_add_ctx_settings(settings s, ...)
   }
   va_end(args);
 }
+
+/* ========================================================== */
+/* Returns 1 if the usage will be displayed on error, else 0. */
+/* ========================================================== */
+int
+ctxopt_usage_on_error()
+{
+  return flags.disp_usage;
+}
