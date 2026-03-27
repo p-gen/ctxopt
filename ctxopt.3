@@ -93,43 +93,50 @@ incoherent data or in case of memory exhaustion.
 All these errors are written to the standard error stream.
 .sp
 \fBctxopt\fP allows users to automatically display usage text after an
-error message by providing the special command\-line argument
+error message by providing the internal command\-line argument
 \fB\-usage_on_error\fP, which calls the \fBctxopt_ctx_disp_usage\fP function.
 .sp
 \fB\-usage_on_error\fP is always available whatever the context.
+.sp
+Error messages can also be disabled using another internal command\-line
+argument: \fB\-no_message_on_error\fP\&.
+In this case, only the return code indicates the cause of the fatal error described
+below.
 .SH RETURN VALUES
+.sp
+In the event of an internal fatal error, \fBctxopt\fP exits with a return code of 1.
 .sp
 In case of a fatal error, \fBctxopt\fP exits with one of the following error
 code defined in \fBctxopt.h\fP:
 .INDENT 0.0
 .IP \(bu 2
-\fBCTXOPTMISPAR\fP: A required option in this context, is missing.
+\fBCTXOPTMISPAR  (2)\fP: A required option in this context, is missing.
 .IP \(bu 2
-\fBCTXOPTREQPAR\fP: At least one option, required by another option, is missing
+\fBCTXOPTREQPAR  (3)\fP: At least one option, required by another option, is missing
 (see \fBctxopt_add_ctx_settings\fP).
 .IP \(bu 2
-\fBCTXOPTMISARG\fP: A mandatory argument is missing.
+\fBCTXOPTMISARG  (4)\fP: A mandatory argument is missing.
 .IP \(bu 2
-\fBCTXOPTDUPOPT\fP: An option can only appear once in this context.
+\fBCTXOPTDUPOPT  (5)\fP: An option can only appear once in this context.
 .IP \(bu 2
-\fBCTXOPTUNKPAR\fP: A parameter doesn\(aqt correspond to any option.
+\fBCTXOPTUNKPAR  (6)\fP: A parameter doesn\(aqt correspond to any option.
 .IP \(bu 2
-\fBCTXOPTINCOPT\fP: An option in incompatible with another option in
+\fBCTXOPTINCOPT  (7)\fP: An option in incompatible with another option in
 this context.
 .IP \(bu 2
-\fBCTXOPTCTEOPT\fP: Bad number of occurrences of an option in this context.
+\fBCTXOPTCTEOPT  (8)\fP: Bad number of occurrences of an option in this context.
 .IP \(bu 2
-\fBCTXOPTCTLOPT\fP: Too many occurrences of an option in this context.
+\fBCTXOPTCTLOPT  (9)\fP: Too many occurrences of an option in this context.
 .IP \(bu 2
-\fBCTXOPTCTGOPT\fP: Not enough occurrences of an option in this context.
+\fBCTXOPTCTGOPT (10)\fP: Not enough occurrences of an option in this context.
 .IP \(bu 2
-\fBCTXOPTCTEARG\fP: Bad number of arguments for this option.
+\fBCTXOPTCTEARG (11)\fP: Bad number of arguments for this option.
 .IP \(bu 2
-\fBCTXOPTCTLARG\fP: Too many arguments for this option.
+\fBCTXOPTCTLARG (12)\fP: Too many arguments for this option.
 .IP \(bu 2
-\fBCTXOPTCTGARG\fP: Not enough arguments for this option.
+\fBCTXOPTCTGARG (13)\fP: Not enough arguments for this option.
 .IP \(bu 2
-\fBCTXOPTUNXARG\fP: This option doesn\(aqt take any argument.
+\fBCTXOPTUNXARG (14)\fP: This option doesn\(aqt take any argument.
 .UNINDENT
 .sp
 In case of an internal error, \fBctxopt\fP exits with the standard

@@ -79,32 +79,39 @@ incoherent data or in case of memory exhaustion.
 All these errors are written to the standard error stream.
 
 **ctxopt** allows users to automatically display usage text after an
-error message by providing the special command-line argument
+error message by providing the internal command-line argument
 **-usage_on_error**, which calls the **ctxopt_ctx_disp_usage** function.
 
 **-usage_on_error** is always available whatever the context.
 
+Error messages can also be disabled using another internal command-line
+argument: **-no_message_on_error**.
+In this case, only the return code indicates the cause of the fatal error described
+below.
+
 RETURN VALUES
 =============
+
+In the event of an internal fatal error, **ctxopt** exits with a return code of 1.
 
 In case of a fatal error, **ctxopt** exits with one of the following error
 code defined in **ctxopt.h**:
 
-- ``CTXOPTMISPAR``: A required option in this context, is missing.
-- ``CTXOPTREQPAR``: At least one option, required by another option, is missing
+- ``CTXOPTMISPAR  (2)``: A required option in this context, is missing.
+- ``CTXOPTREQPAR  (3)``: At least one option, required by another option, is missing
   (see **ctxopt_add_ctx_settings**).
-- ``CTXOPTMISARG``: A mandatory argument is missing.
-- ``CTXOPTDUPOPT``: An option can only appear once in this context.
-- ``CTXOPTUNKPAR``: A parameter doesn't correspond to any option.
-- ``CTXOPTINCOPT``: An option in incompatible with another option in
+- ``CTXOPTMISARG  (4)``: A mandatory argument is missing.
+- ``CTXOPTDUPOPT  (5)``: An option can only appear once in this context.
+- ``CTXOPTUNKPAR  (6)``: A parameter doesn't correspond to any option.
+- ``CTXOPTINCOPT  (7)``: An option in incompatible with another option in
   this context.
-- ``CTXOPTCTEOPT``: Bad number of occurrences of an option in this context.
-- ``CTXOPTCTLOPT``: Too many occurrences of an option in this context.
-- ``CTXOPTCTGOPT``: Not enough occurrences of an option in this context.
-- ``CTXOPTCTEARG``: Bad number of arguments for this option.
-- ``CTXOPTCTLARG``: Too many arguments for this option.
-- ``CTXOPTCTGARG``: Not enough arguments for this option.
-- ``CTXOPTUNXARG``: This option doesn't take any argument.
+- ``CTXOPTCTEOPT  (8)``: Bad number of occurrences of an option in this context.
+- ``CTXOPTCTLOPT  (9)``: Too many occurrences of an option in this context.
+- ``CTXOPTCTGOPT (10)``: Not enough occurrences of an option in this context.
+- ``CTXOPTCTEARG (11)``: Bad number of arguments for this option.
+- ``CTXOPTCTLARG (12)``: Too many arguments for this option.
+- ``CTXOPTCTGARG (13)``: Not enough arguments for this option.
+- ``CTXOPTUNXARG (14)``: This option doesn't take any argument.
 
 In case of an internal error, **ctxopt** exits with the standard
 ``EXIT_FAILURE`` code.
