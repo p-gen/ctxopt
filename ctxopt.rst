@@ -86,20 +86,21 @@ error message by providing the internal command-line argument
 
 Error messages can also be disabled using another internal command-line
 argument: **-no_message_on_error**.
-In this case, only the return code indicates the cause of the fatal error described
-below.
+In this case, only the return code indicates the cause of the fatal error
+described below.
 
 RETURN VALUES
 =============
 
-In the event of an internal fatal error, **ctxopt** exits with a return code of 1.
+In the event of an internal fatal error, **ctxopt** exits with a return code
+of 1.
 
 In case of a fatal error, **ctxopt** exits with one of the following error
 code defined in **ctxopt.h**:
 
-- ``CTXOPTMISPAR  (2)``: A required option in this context, is missing.
-- ``CTXOPTREQPAR  (3)``: At least one option, required by another option, is missing
-  (see **ctxopt_add_ctx_settings**).
+- ``CTXOPTMISPAR  (2)``: A required option is missing in this context.
+- ``CTXOPTREQPAR  (3)``: At least one option, required by another option,
+  is missing (see **ctxopt_add_ctx_settings**).
 - ``CTXOPTMISARG  (4)``: A mandatory argument is missing.
 - ``CTXOPTDUPOPT  (5)``: An option can only appear once in this context.
 - ``CTXOPTUNKPAR  (6)``: A parameter doesn't correspond to any option.

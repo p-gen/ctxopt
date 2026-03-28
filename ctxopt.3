@@ -100,20 +100,21 @@ error message by providing the internal command\-line argument
 .sp
 Error messages can also be disabled using another internal command\-line
 argument: \fB\-no_message_on_error\fP\&.
-In this case, only the return code indicates the cause of the fatal error described
-below.
+In this case, only the return code indicates the cause of the fatal error
+described below.
 .SH RETURN VALUES
 .sp
-In the event of an internal fatal error, \fBctxopt\fP exits with a return code of 1.
+In the event of an internal fatal error, \fBctxopt\fP exits with a return code
+of 1.
 .sp
 In case of a fatal error, \fBctxopt\fP exits with one of the following error
 code defined in \fBctxopt.h\fP:
 .INDENT 0.0
 .IP \(bu 2
-\fBCTXOPTMISPAR  (2)\fP: A required option in this context, is missing.
+\fBCTXOPTMISPAR  (2)\fP: A required option is missing in this context.
 .IP \(bu 2
-\fBCTXOPTREQPAR  (3)\fP: At least one option, required by another option, is missing
-(see \fBctxopt_add_ctx_settings\fP).
+\fBCTXOPTREQPAR  (3)\fP: At least one option, required by another option,
+is missing (see \fBctxopt_add_ctx_settings\fP).
 .IP \(bu 2
 \fBCTXOPTMISARG  (4)\fP: A mandatory argument is missing.
 .IP \(bu 2
