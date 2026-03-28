@@ -4361,13 +4361,13 @@ ctxopt_new_ctx(char *name, char *opts_specs)
   if (init_opts("[*usage_on_error]", ctx) == 0)
     exit(1);
 
-  if (init_opts(opts_specs, ctx) == 0)
-    exit(1);
-
   /* Creation of the pseudo option no_message_on_error n this context here */
   /* to make sure for it to appears in the automatically generated usage.  */
   /* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
   if (init_opts("[*no_message_on_error]", ctx) == 0)
+    exit(1);
+
+  if (init_opts(opts_specs, ctx) == 0)
     exit(1);
 
   if (bst_find(ctx, &contexts_bst, ctx_compare) != NULL)
