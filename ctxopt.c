@@ -2637,15 +2637,19 @@ opt_parse(char *s, opt_t **opt)
       if (*s == '<' || *s == '=' || *s == '>')
       {
         unsigned value;
-        int      offset;
+        int      offset = 0;
 
         n = sscanf(s + 1, "%u%n", &value, &offset);
-        if (n == 1)
+        if (n != 1)
         {
-          opt_count_matter = 1;
-          opt_count_oper   = *s;
-          opt_count_mark   = value;
+          free(opt_name);
+          return -(s - s_orig - 1);
         }
+
+        opt_count_matter = 1;
+        opt_count_oper   = *s;
+        opt_count_mark   = value;
+
         s += offset + 1;
       }
     }
@@ -2703,15 +2707,19 @@ opt_parse(char *s, opt_t **opt)
       if (*s == '<' || *s == '=' || *s == '>')
       {
         unsigned value;
-        int      offset;
+        int      offset = 0;
 
         n = sscanf(s + 1, "%u%n", &value, &offset);
-        if (n == 1)
+        if (n != 1)
         {
-          opt_args_count_matter = 1;
-          opt_args_count_oper   = *s;
-          opt_args_count_mark   = value;
+          free(opt_name);
+          return -(s - s_orig - 1);
         }
+
+        opt_args_count_matter = 1;
+        opt_args_count_oper   = *s;
+        opt_args_count_mark   = value;
+
         s += offset + 1;
       }
 
@@ -2953,9 +2961,9 @@ ctxopt_init(char *prog_name, char *init_flags)
 
   ctxopt_initialized = 1;
 
-  /* Initialize current_state.*/
-  /* """""""""""""""""""""""" */
-  cur_state = xcalloc(sizeof(state_t), 0);
+  /* Initialize current_state. */
+  /* """"""""""""""""""""""""" */
+  cur_state = xcalloc(1, sizeof(*cur_state));
 
   /* Initialize custom error function pointers to NULL. */
   /* """""""""""""""""""""""""""""""""""""""""""""""""" */
@@ -3536,8 +3544,8 @@ ctxopt_analyze(int nb_words, char **words, int *nb_rem_args, char ***rem_args)
   ctx_t      *ctx;
   opt_t      *opt = NULL;
   par_t      *par;
-  ctx_inst_t *ctx_inst;
-  opt_inst_t *opt_inst;
+  ctx_inst_t *ctx_inst          = NULL;
+  opt_inst_t *opt_inst          = NULL;
   int         expect_par        = 0;
   int         expect_arg        = 0;
   int         expect_par_or_arg = 0;
@@ -4594,6 +4602,7 @@ ctxopt_re_constraint(int nb_args, char **args, char *value, char *par)
             value,
             par,
             args[0]);
+    regfree(&re);
     return 0;
   }
 
@@ -4647,7 +4656,7 @@ ctxopt_range_constraint(int nb_args, char **args, char *value, char *par)
 
   errno = 0;
   v     = strtol(value, &ptr, 10);
-  if (errno || ptr == value)
+  if (errno == ERANGE || ptr == value || *ptr != '\0')
     return 0;
 
   if (min_only)
@@ -4765,7 +4774,7 @@ ctxopt_add_opt_settings(settings s, ...)
     case parameters:
     {
       char *opt_name = NULL;
-      char *params;
+      char *params   = NULL;
 
       /* The second argument must be a string containing: */
       /* - The name of an existing option.                */
