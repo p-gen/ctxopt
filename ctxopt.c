@@ -5181,7 +5181,7 @@ ctxopt_add_ctx_settings(settings s, ...)
 /* Returns 1 if the usage will be displayed on error, else 0. */
 /* ========================================================== */
 int
-ctxopt_usage_on_error()
+ctxopt_usage_on_error(void)
 {
   return flags.disp_usage;
 }
