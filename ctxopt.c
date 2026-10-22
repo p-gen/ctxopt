@@ -4698,7 +4698,7 @@ ctxopt_range_constraint(int nb_args, char **args, char *value, char *par)
 void
 ctxopt_add_global_settings(settings s, ...)
 {
-  va_list(args);
+  va_list args;
   va_start(args, s);
 
   if (!ctxopt_initialized)
@@ -4755,7 +4755,7 @@ ctxopt_add_opt_settings(settings s, ...)
   if (!ctxopt_initialized)
     fatal_internal("Please call ctxopt_init first.");
 
-  va_list(args);
+  va_list args;
   va_start(args, s);
 
   switch (s)
@@ -5065,7 +5065,7 @@ ctxopt_add_ctx_settings(settings s, ...)
   if (!ctxopt_initialized)
     fatal_internal("Please call ctxopt_init first.");
 
-  va_list(args);
+  va_list args;
   va_start(args, s);
 
   switch (s)
